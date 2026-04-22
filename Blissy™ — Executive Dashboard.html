@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<!-- saved from url=(0062)file:///C:/Users/pedro/Downloads/Blissy_Excel_Dashboard_1.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blissy™ — Executive Dashboard</title>
+<script src="./Blissy™ — Executive Dashboard_files/chart.umd.min.js.download"></script>
+<link href="./Blissy™ — Executive Dashboard_files/css2" rel="stylesheet">
+<style>
+:root{
+  --black:#0A0A0A; --near:#1C1C1C; --charcoal:#2D2D2D;
+  --mid:#6B6B6B; --light:#ABABAB; --lighter:#D0CCC8;
+  --white:#FFFFFF; --off:#FAFAF8; --silk:#F5F3EF; --silk2:#EDE9E2;
+  --border:#E2DDD6; --border2:#D0C9BE;
+  --gold:#B8892A; --gold2:#D4AA50; --gold-bg:#FBF5E8;
+  --green:#2E7D52; --green-bg:#EAF4EE;
+  --red:#B03030; --red-bg:#FCEAEA;
+  --blue:#2B5BA8; --blue-bg:#EBF0FA;
+  --col-goal:#F0EBE0; --col-w1:#FAFAF8; --col-w2:#FAFAF8;
+  --col-actual:#F5F3EF; --col-header:#1C1C1C;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Jost',sans-serif;background:var(--off);color:var(--black);font-size:13px;font-weight:300;}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--black);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;position:sticky;top:0;z-index:300;border-bottom:1px solid #2a2a2a;}
+.logo{font-family:'Playfair Display',serif;font-size:19px;letter-spacing:5px;color:var(--gold2);display:flex;align-items:center;gap:9px;}
+.logo svg{width:24px;height:24px;}
+.logo-tm{font-size:8px;font-weight:300;vertical-align:super;color:rgba(212,170,80,0.6);}
+.topbar-right{display:flex;align-items:center;gap:20px;}
+.topbar-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);}
+
+/* ── FILTER BAR ── */
+.filterbar{background:var(--near);border-bottom:1px solid #2e2e2e;padding:0 32px;display:flex;align-items:center;gap:0;height:48px;position:sticky;top:56px;z-index:200;}
+.filter-group{display:flex;align-items:center;gap:0;border-right:1px solid #333;padding:0 20px 0 0;margin-right:20px;}
+.filter-group:first-child{padding-left:0;}
+.filter-label{font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-right:10px;white-space:nowrap;}
+.filter-chips{display:flex;gap:4px;}
+.chip{padding:5px 13px;border:1px solid rgba(255,255,255,0.1);border-radius:4px;background:transparent;color:rgba(255,255,255,0.4);font-family:'Jost',sans-serif;font-size:10px;font-weight:500;letter-spacing:0.8px;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.chip:hover{border-color:rgba(255,255,255,0.25);color:rgba(255,255,255,0.7);}
+.chip.active{background:var(--gold);border-color:var(--gold);color:var(--black);}
+.chip.week-chip.selected{background:rgba(184,137,42,0.2);border-color:var(--gold);color:var(--gold2);}
+.filter-sep{width:1px;height:20px;background:#333;margin:0 20px;}
+
+/* compare toggle */
+.compare-toggle{display:flex;align-items:center;gap:8px;font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:0.5px;cursor:pointer;user-select:none;}
+.toggle-switch{width:30px;height:16px;background:#333;border-radius:8px;position:relative;transition:background 0.2s;flex-shrink:0;}
+.toggle-switch.on{background:var(--gold);}
+.toggle-knob{width:12px;height:12px;background:white;border-radius:50%;position:absolute;top:2px;left:2px;transition:left 0.2s;}
+.toggle-switch.on .toggle-knob{left:16px;}
+
+/* ── SUMMARY STRIP ── */
+.summary-strip{background:var(--black);border-bottom:1px solid #222;display:flex;overflow-x:auto;}
+.summary-kpi{flex:1;min-width:140px;padding:16px 20px;border-right:1px solid #1e1e1e;cursor:default;}
+.summary-kpi:last-child{border-right:none;}
+.summary-kpi:hover{background:rgba(255,255,255,0.03);}
+.sk-label{font-size:8px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:7px;}
+.sk-val{font-family:'Playfair Display',serif;font-size:22px;font-weight:400;color:var(--white);line-height:1;}
+.sk-delta{font-size:9px;margin-top:5px;display:flex;align-items:center;gap:4px;}
+.sk-delta.up{color:#4CAF82;}
+.sk-delta.dn{color:#E06060;}
+.sk-delta.nt{color:rgba(255,255,255,0.25);}
+
+/* ── MAIN LAYOUT ── */
+.main-layout{display:flex;min-height:calc(100vh - 104px);}
+
+/* ── SIDEBAR ── */
+.sidebar{width:220px;flex-shrink:0;background:var(--white);border-right:1px solid var(--border);padding:20px 0;position:sticky;top:104px;height:calc(100vh - 104px);overflow-y:auto;}
+.sidebar-section{margin-bottom:4px;}
+.sidebar-group{font-size:8px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);padding:14px 18px 6px;display:flex;align-items:center;gap:6px;}
+.sidebar-group::after{content:'';flex:1;height:1px;background:var(--border);}
+.sidebar-item{padding:7px 18px 7px 24px;font-size:11.5px;font-weight:300;color:var(--mid);cursor:pointer;transition:all 0.12s;display:flex;align-items:center;gap:7px;border-left:2px solid transparent;}
+.sidebar-item:hover{background:var(--silk);color:var(--charcoal);}
+.sidebar-item.active{background:var(--gold-bg);color:var(--gold);border-left-color:var(--gold);font-weight:500;}
+.sidebar-dot{width:4px;height:4px;border-radius:50%;background:currentColor;flex-shrink:0;opacity:0.5;}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow:auto;padding:0;}
+
+/* ── SECTION TITLE ── */
+.section-head{padding:20px 28px 0;display:flex;align-items:baseline;gap:14px;margin-bottom:16px;}
+.section-head-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:400;}
+.section-head-sub{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--light);}
+.section-head-rule{flex:1;height:1px;background:var(--border);}
+
+/* ── CHART AREA ── */
+.chart-area{padding:0 28px 20px;display:grid;gap:14px;}
+.chart-area.g3{grid-template-columns:2fr 1fr 1fr;}
+.chart-area.g2{grid-template-columns:1fr 1fr;}
+.chart-area.g1{grid-template-columns:1fr;}
+.chart-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:20px;}
+.cc-eyebrow{font-size:8px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--lighter);margin-bottom:3px;}
+.cc-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:400;margin-bottom:16px;}
+
+/* ── MAIN TABLE (Excel-style) ── */
+.table-wrap{padding:0 28px 28px;overflow-x:auto;}
+.ex-table{width:100%;border-collapse:collapse;font-size:12px;}
+.ex-table thead{position:sticky;top:0;z-index:10;}
+
+/* Header rows */
+.ex-table .h-month th{background:var(--col-header);color:rgba(255,255,255,0.9);font-family:'Playfair Display',serif;font-size:12px;font-weight:400;letter-spacing:0.5px;padding:10px 10px 8px;border:1px solid #333;text-align:center;}
+.ex-table .h-month th.th-metric{background:var(--col-header);text-align:left;color:rgba(255,255,255,0.5);font-family:'Jost',sans-serif;font-size:8px;font-weight:600;letter-spacing:2px;text-transform:uppercase;}
+.ex-table .h-cols th{font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:7px 10px;border:1px solid var(--border2);text-align:right;}
+.ex-table .h-cols th.th-metric{text-align:left;background:var(--silk2);color:var(--mid);}
+.ex-table .h-cols .th-goal{background:#E8E0D0;color:#7A6030;}
+.ex-table .h-cols .th-week{background:var(--white);color:var(--mid);}
+.ex-table .h-cols .th-week.th-week-sel{background:#EBF0FA;color:var(--blue);}
+.ex-table .h-cols .th-actual{background:var(--silk2);color:var(--charcoal);}
+.ex-table .h-cols .th-source{background:var(--silk2);color:var(--lighter);font-size:7px;}
+
+/* Data rows */
+.ex-table tbody tr td{padding:8px 10px;border:1px solid var(--border);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
+.ex-table tbody tr td.td-metric{text-align:left;font-weight:400;color:var(--black);background:var(--off) !important;position:sticky;left:0;z-index:5;border-right:2px solid var(--border2);min-width:220px;max-width:220px;}
+.ex-table tbody tr td.td-source{font-size:9px;color:var(--lighter);background:var(--off) !important;position:sticky;left:220px;z-index:5;border-right:1px solid var(--border2);width:90px;text-align:left;}
+
+/* Section rows */
+.ex-table .tr-section td{background:var(--near) !important;color:var(--gold2);font-size:8px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;padding:8px 10px 5px;border-color:#333 !important;}
+
+/* Goal column */
+.td-goal{background:var(--col-goal) !important;color:#7A6030;}
+
+/* Week columns */
+.td-week{background:var(--white) !important;color:var(--charcoal);}
+.td-week.week-sel{background:var(--blue-bg) !important;color:var(--blue);}
+
+/* Actual column */
+.td-actual{background:var(--silk) !important;color:var(--charcoal);font-weight:500 !important;}
+
+/* vs Goal badge */
+.vs-goal{display:inline-block;font-size:8px;font-weight:700;padding:1px 5px;border-radius:3px;margin-left:4px;}
+.vs-goal.above{background:var(--green-bg);color:var(--green);}
+.vs-goal.below{background:var(--red-bg);color:var(--red);}
+
+/* Subtotal / total rows */
+.tr-subtotal td{font-weight:600 !important;color:var(--black) !important;background:var(--silk) !important;}
+.tr-total td{font-weight:700 !important;color:var(--black) !important;background:var(--silk2) !important;font-size:13px;}
+.tr-pct td{color:var(--mid) !important;font-size:11px !important;font-weight:300 !important;background:var(--off) !important;}
+
+/* Compare highlight */
+.td-compare{background:#FEF9EC !important;outline:1px solid var(--gold);outline-offset:-1px;}
+
+/* ── FOOTER ── */
+.footer{background:var(--black);padding:20px 32px;display:flex;justify-content:space-between;align-items:center;margin-top:auto;}
+.footer-logo{font-family:'Playfair Display',serif;font-size:14px;letter-spacing:4px;color:rgba(255,255,255,0.2);}
+.footer-text{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.15);}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+/* ── PERIOD TAG ── */
+.period-tag{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:3px;font-size:9px;font-weight:600;letter-spacing:1px;}
+.period-tag.actual{background:var(--silk2);color:var(--mid);}
+.period-tag.goal{background:#E8E0D0;color:#7A6030;}
+.period-tag.selected{background:var(--blue-bg);color:var(--blue);}
+</style>
+</head>
+<body>
+
+<!-- ── TOPBAR ── -->
+<header class="topbar">
+  <div class="logo">
+    <svg viewBox="0 0 24 24" fill="none">
+      <ellipse cx="12" cy="12" rx="9.5" ry="7" stroke="#D4AA50" stroke-width="1" opacity="0.6"></ellipse>
+      <ellipse cx="12" cy="12" rx="6" ry="4.5" stroke="#D4AA50" stroke-width="1" opacity="0.85"></ellipse>
+      <ellipse cx="12" cy="12" rx="2.5" ry="2" fill="#B8892A"></ellipse>
+    </svg>
+    BLISSY<span class="logo-tm">™</span>
+  </div>
+  <div class="topbar-right">
+    <span class="topbar-label" id="periodLabel">Jan — Apr 2026 &nbsp;·&nbsp; Consolidated</span>
+  </div>
+</header>
+
+<!-- ── FILTER BAR ── -->
+<div class="filterbar">
+  <!-- Month filter -->
+  <div class="filter-group">
+    <span class="filter-label">Month</span>
+    <div class="filter-chips">
+      <button class="chip active" onclick="setMonth(&#39;all&#39;,this)">All</button>
+      <button class="chip" onclick="setMonth(&#39;jan&#39;,this)">Jan</button>
+      <button class="chip" onclick="setMonth(&#39;feb&#39;,this)">Feb</button>
+      <button class="chip" onclick="setMonth(&#39;mar&#39;,this)">Mar</button>
+      <button class="chip" onclick="setMonth(&#39;apr&#39;,this)">Apr</button>
+    </div>
+  </div>
+
+  <!-- Week filter -->
+  <div class="filter-group">
+    <span class="filter-label">Weeks</span>
+    <div class="filter-chips" id="weekChips">
+      <button class="chip week-chip selected" data-week="w1" onclick="toggleWeek(&#39;w1&#39;,this)">W1</button>
+      <button class="chip week-chip selected" data-week="w2" onclick="toggleWeek(&#39;w2&#39;,this)">W2</button>
+      <button class="chip week-chip selected" data-week="w3" onclick="toggleWeek(&#39;w3&#39;,this)">W3</button>
+      <button class="chip week-chip selected" data-week="w4" onclick="toggleWeek(&#39;w4&#39;,this)">W4</button>
+    </div>
+  </div>
+
+  <!-- Compare toggle -->
+  <div class="filter-group" style="border-right:none;margin-right:0">
+    <span class="filter-label">Compare</span>
+    <div class="compare-toggle" onclick="toggleCompare()">
+      <div class="toggle-switch" id="compareSwitch"><div class="toggle-knob"></div></div>
+      <span id="compareLabel" style="color: rgba(255, 255, 255, 0.25);">Prior week</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── SUMMARY STRIP ── -->
+<div class="summary-strip" id="summaryStrip">
+    <div class="summary-kpi">
+      <div class="sk-label">Gross Revenue</div>
+      <div class="sk-val">$40.5M</div>
+      <div class="sk-delta dn">↓ -4.5% vs goal</div>
+    </div>
+    <div class="summary-kpi">
+      <div class="sk-label">Net Revenue</div>
+      <div class="sk-val">$28.4M</div>
+      <div class="sk-delta nt">YTD</div>
+    </div>
+    <div class="summary-kpi">
+      <div class="sk-label">Gross Margin</div>
+      <div class="sk-val">68.8%</div>
+      <div class="sk-delta nt">YTD</div>
+    </div>
+    <div class="summary-kpi">
+      <div class="sk-label">EBITDA</div>
+      <div class="sk-val">$2.7M</div>
+      <div class="sk-delta nt">YTD</div>
+    </div>
+    <div class="summary-kpi">
+      <div class="sk-label">Contrib. Margin</div>
+      <div class="sk-val">40.6%</div>
+      <div class="sk-delta nt">YTD</div>
+    </div>
+    <div class="summary-kpi">
+      <div class="sk-label">Total Orders</div>
+      <div class="sk-val">223,392.857</div>
+      <div class="sk-delta nt">YTD</div>
+    </div>
+    <div class="summary-kpi">
+      <div class="sk-label">ROAS</div>
+      <div class="sk-val">4.99×</div>
+      <div class="sk-delta nt">YTD</div>
+    </div></div>
+
+<!-- ── BODY ── -->
+<div class="main-layout">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-group">P&amp;L</div>
+      <div class="sidebar-item" onclick="showSection(&#39;pl&#39;,this)"><span class="sidebar-dot"></span>Revenue &amp; Margin</div>
+      <div class="sidebar-item" onclick="showSection(&#39;costs&#39;,this)"><span class="sidebar-dot"></span>COGS &amp; Gross Profit</div>
+      <div class="sidebar-item" onclick="showSection(&#39;opex&#39;,this)"><span class="sidebar-dot"></span>OpEx &amp; EBITDA</div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-group">Marketing</div>
+      <div class="sidebar-item" onclick="showSection(&#39;mkt&#39;,this)"><span class="sidebar-dot"></span>ROAS &amp; Efficiency</div>
+      <div class="sidebar-item" onclick="showSection(&#39;adspend&#39;,this)"><span class="sidebar-dot"></span>Ad Spend Channels</div>
+      <div class="sidebar-item" onclick="showSection(&#39;customers&#39;,this)"><span class="sidebar-dot"></span>New vs Repeat</div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-group">Full View</div>
+      <div class="sidebar-item active" onclick="showSection(&#39;full&#39;,this)"><span class="sidebar-dot"></span>All Metrics</div>
+    </div>
+  </nav>
+
+  <!-- CONTENT -->
+  <div class="content" id="contentArea">
+    <!-- Charts -->
+    <div id="chartsArea" style="padding-top:4px;">
+      <div class="section-head">
+        <span class="section-head-title" id="sectionTitle">All Metrics</span>
+        <span class="section-head-sub" id="sectionSub">Complete Dashboard</span>
+        <div class="section-head-rule"></div>
+      </div>
+      <div class="chart-area g3" id="chartGrid">
+        <div class="chart-card"><div class="cc-eyebrow">Current selection</div><div class="cc-title" id="c1title">Gross Revenue</div><canvas id="c1" height="334" style="box-sizing: border-box; display: block; height: 267px; width: 501px;" width="627"></canvas></div>
+        <div class="chart-card"><div class="cc-eyebrow">Trend</div><div class="cc-title" id="c2title">EBITDA</div><canvas id="c2" height="200" style="box-sizing: border-box; display: block; height: 160px; width: 300px;" width="375"></canvas></div>
+        <div class="chart-card"><div class="cc-eyebrow">Efficiency</div><div class="cc-title" id="c3title">ROAS</div><canvas id="c3" height="200" style="box-sizing: border-box; display: block; height: 160px; width: 300px;" width="375"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Excel-style Table -->
+    <div class="table-wrap">
+      <div id="tableContainer"><table class="ex-table"><thead><tr class="h-month"><th class="th-metric" rowspan="2">Metric</th><th class="th-metric" rowspan="2">Source</th><th colspan="6" style="background:#1C1C1C;border-bottom:1px solid #333">January 2026</th><th colspan="6" style="background:#1C1C1C;border-bottom:1px solid #333">February 2026</th><th colspan="6" style="background:#1C1C1C;border-bottom:1px solid #333">March 2026</th><th colspan="6" style="background:#1C1C1C;border-bottom:1px solid #333">April 2026 (PTD)</th></tr><tr class="h-cols"><th class="th-goal">Goal</th><th class="th-week th-week-sel">Week 1</th><th class="th-week th-week-sel">Week 2</th><th class="th-week th-week-sel">Week 3</th><th class="th-week th-week-sel">Week 4</th><th class="th-actual">Monthly Actual</th><th class="th-goal">Goal</th><th class="th-week th-week-sel">Week 1</th><th class="th-week th-week-sel">Week 2</th><th class="th-week th-week-sel">Week 3</th><th class="th-week th-week-sel">Week 4</th><th class="th-actual">Monthly Actual</th><th class="th-goal">Goal</th><th class="th-week th-week-sel">Week 1</th><th class="th-week th-week-sel">Week 2</th><th class="th-week th-week-sel">Week 3</th><th class="th-week th-week-sel">Week 4</th><th class="th-actual">Monthly Actual</th><th class="th-goal">Goal</th><th class="th-week th-week-sel">Week 1</th><th class="th-week th-week-sel">Week 2</th><th class="th-week th-week-sel">Week 3</th><th class="th-week th-week-sel">Week 4</th><th class="th-actual">Monthly Actual</th></tr></thead><tbody><tr class="tr-section"><td class="td-metric" colspan="26">Revenue</td></tr><tr class=""><td class="td-metric">Gross Revenue</td><td class="td-source">Hex, Sellerboard</td><td class="td-goal">$10.27M</td><td class="td-week week-sel">$2.78M</td><td class="td-week week-sel">$2.15M</td><td class="td-week week-sel">$2.59M</td><td class="td-week week-sel">$2.44M</td><td class="td-actual">$10.93M <span class="vs-goal above">+6%</span></td><td class="td-goal">$9.65M</td><td class="td-week week-sel">$2.61M</td><td class="td-week week-sel">$2.59M</td><td class="td-week week-sel">$2.97M</td><td class="td-week week-sel">$2.16M</td><td class="td-actual">$10.33M <span class="vs-goal above">+7%</span></td><td class="td-goal">$11.14M</td><td class="td-week week-sel">$2.97M</td><td class="td-week week-sel">$4.65M</td><td class="td-week week-sel">$2.24M</td><td class="td-week week-sel">$1.98M</td><td class="td-actual">$12.48M <span class="vs-goal above">+12%</span></td><td class="td-goal">$11.37M</td><td class="td-week week-sel">$2.15M</td><td class="td-week week-sel">$1.88M</td><td class="td-week week-sel">$702K</td><td class="td-week week-sel">$0</td><td class="td-actual">$6.77M <span class="vs-goal below">-40%</span></td></tr><tr class=""><td class="td-metric">Shipping Revenue</td><td class="td-source">Hex, Sellerboard</td><td class="td-goal">$62K</td><td class="td-week week-sel">$17K</td><td class="td-week week-sel">$13K</td><td class="td-week week-sel">$12K</td><td class="td-week week-sel">$13K</td><td class="td-actual">$61K <span class="vs-goal below">-2%</span></td><td class="td-goal">$58K</td><td class="td-week week-sel">$16K</td><td class="td-week week-sel">$14K</td><td class="td-week week-sel">$13K</td><td class="td-week week-sel">$12K</td><td class="td-actual">$55K <span class="vs-goal below">-6%</span></td><td class="td-goal">$67K</td><td class="td-week week-sel">$18K</td><td class="td-week week-sel">$17K</td><td class="td-week week-sel">$13K</td><td class="td-week week-sel">$12K</td><td class="td-actual">$62K <span class="vs-goal below">-8%</span></td><td class="td-goal">$69K</td><td class="td-week week-sel">$4K</td><td class="td-week week-sel">$7K</td><td class="td-week week-sel">$4K</td><td class="td-week week-sel">$0</td><td class="td-actual">$21K <span class="vs-goal below">-69%</span></td></tr><tr class=""><td class="td-metric">Discounts</td><td class="td-source">Hex, Sellerboard</td><td class="td-goal">($2.38M)</td><td class="td-week week-sel">($555K)</td><td class="td-week week-sel">($367K)</td><td class="td-week week-sel">($807K)</td><td class="td-week week-sel">($720K)</td><td class="td-actual">($2.72M) <span class="vs-goal above">+14%</span></td><td class="td-goal">($2.24M)</td><td class="td-week week-sel">($780K)</td><td class="td-week week-sel">($656K)</td><td class="td-week week-sel">($812K)</td><td class="td-week week-sel">($492K)</td><td class="td-actual">($2.74M) <span class="vs-goal above">+22%</span></td><td class="td-goal">($2.58M)</td><td class="td-week week-sel">($920K)</td><td class="td-week week-sel">($1.32M)</td><td class="td-week week-sel">($614K)</td><td class="td-week week-sel">($627K)</td><td class="td-actual">($3.66M) <span class="vs-goal above">+42%</span></td><td class="td-goal">($2.64M)</td><td class="td-week week-sel">($525K)</td><td class="td-week week-sel">($561K)</td><td class="td-week week-sel">($268K)</td><td class="td-week week-sel">$0</td><td class="td-actual">($1.93M) <span class="vs-goal below">-27%</span></td></tr><tr class=""><td class="td-metric">Refunds</td><td class="td-source">Hex, Sellerboard</td><td class="td-goal">($409K)</td><td class="td-week week-sel">($114K)</td><td class="td-week week-sel">($93K)</td><td class="td-week week-sel">($76K)</td><td class="td-week week-sel">($87K)</td><td class="td-actual">($406K) <span class="vs-goal below">-1%</span></td><td class="td-goal">($384K)</td><td class="td-week week-sel">($90K)</td><td class="td-week week-sel">($97K)</td><td class="td-week week-sel">($105K)</td><td class="td-week week-sel">($89K)</td><td class="td-actual">($381K) <span class="vs-goal below">-1%</span></td><td class="td-goal">($444K)</td><td class="td-week week-sel">($105K)</td><td class="td-week week-sel">($86K)</td><td class="td-week week-sel">($69K)</td><td class="td-week week-sel">($54K)</td><td class="td-actual">($331K) <span class="vs-goal below">-25%</span></td><td class="td-goal">($453K)</td><td class="td-week week-sel">($36K)</td><td class="td-week week-sel">($33K)</td><td class="td-week week-sel">($15K)</td><td class="td-week week-sel">$0</td><td class="td-actual">($121K) <span class="vs-goal below">-73%</span></td></tr><tr class="tr-total"><td class="td-metric">Net Revenue</td><td class="td-source"></td><td class="td-goal">$7.54M</td><td class="td-week week-sel">$2.13M</td><td class="td-week week-sel">$1.70M</td><td class="td-week week-sel">$1.72M</td><td class="td-week week-sel">$1.65M</td><td class="td-actual">$7.87M <span class="vs-goal above">+4%</span></td><td class="td-goal">$7.09M</td><td class="td-week week-sel">$1.76M</td><td class="td-week week-sel">$1.85M</td><td class="td-week week-sel">$2.06M</td><td class="td-week week-sel">$1.59M</td><td class="td-actual">$7.26M <span class="vs-goal above">+2%</span></td><td class="td-goal">$8.18M</td><td class="td-week week-sel">$1.96M</td><td class="td-week week-sel">$3.26M</td><td class="td-week week-sel">$1.57M</td><td class="td-week week-sel">$1.31M</td><td class="td-actual">$8.55M <span class="vs-goal above">+5%</span></td><td class="td-goal">$8.35M</td><td class="td-week week-sel">$1.60M</td><td class="td-week week-sel">$1.30M</td><td class="td-week week-sel">$422K</td><td class="td-week week-sel">$0</td><td class="td-actual">$4.74M <span class="vs-goal below">-43%</span></td></tr><tr class="tr-section"><td class="td-metric" colspan="26">COGS</td></tr><tr class=""><td class="td-metric">COGS - Product</td><td class="td-source">Hex, Sellerboard</td><td class="td-goal">$1.66M</td><td class="td-week week-sel">$479K</td><td class="td-week week-sel">$373K</td><td class="td-week week-sel">$413K</td><td class="td-week week-sel">$382K</td><td class="td-actual">$1.79M <span class="vs-goal below">+8%</span></td><td class="td-goal">$1.19M</td><td class="td-week week-sel">$380K</td><td class="td-week week-sel">$418K</td><td class="td-week week-sel">$465K</td><td class="td-week week-sel">$318K</td><td class="td-actual">$1.58M <span class="vs-goal below">+33%</span></td><td class="td-goal">$1.37M</td><td class="td-week week-sel">$429K</td><td class="td-week week-sel">$1.10M</td><td class="td-week week-sel">$348K</td><td class="td-week week-sel">$294K</td><td class="td-actual">$2.27M <span class="vs-goal below">+65%</span></td><td class="td-goal">$1.40M</td><td class="td-week week-sel">$507K</td><td class="td-week week-sel">$309K</td><td class="td-week week-sel">$100K</td><td class="td-week week-sel">$0</td><td class="td-actual">$1.31M <span class="vs-goal above">-7%</span></td></tr><tr class=""><td class="td-metric">COGS - Shipping</td><td class="td-source">Hex, Sellerboard</td><td class="td-goal">$302K</td><td class="td-week week-sel">$103K</td><td class="td-week week-sel">$85K</td><td class="td-week week-sel">$96K</td><td class="td-week week-sel">$72K</td><td class="td-actual">$386K <span class="vs-goal below">+28%</span></td><td class="td-goal">$268K</td><td class="td-week week-sel">$83K</td><td class="td-week week-sel">$92K</td><td class="td-week week-sel">$107K</td><td class="td-week week-sel">$73K</td><td class="td-actual">$356K <span class="vs-goal below">+33%</span></td><td class="td-goal">$310K</td><td class="td-week week-sel">$92K</td><td class="td-week week-sel">$88K</td><td class="td-week week-sel">$81K</td><td class="td-week week-sel">$67K</td><td class="td-actual">$350K <span class="vs-goal below">+13%</span></td><td class="td-goal">$316K</td><td class="td-week week-sel">$44K</td><td class="td-week week-sel">$55K</td><td class="td-week week-sel">$18K</td><td class="td-week week-sel">$0</td><td class="td-actual">$168K <span class="vs-goal above">-47%</span></td></tr><tr class="tr-subtotal"><td class="td-metric">Gross Profit</td><td class="td-source"></td><td class="td-goal">$5.58M</td><td class="td-week week-sel">$1.54M</td><td class="td-week week-sel">$1.24M</td><td class="td-week week-sel">$1.21M</td><td class="td-week week-sel">$1.19M</td><td class="td-actual">$5.70M <span class="vs-goal above">+2%</span></td><td class="td-goal">$5.63M</td><td class="td-week week-sel">$1.29M</td><td class="td-week week-sel">$1.34M</td><td class="td-week week-sel">$1.49M</td><td class="td-week week-sel">$1.20M</td><td class="td-actual">$5.32M <span class="vs-goal below">-5%</span></td><td class="td-goal">$6.49M</td><td class="td-week week-sel">$1.44M</td><td class="td-week week-sel">$2.07M</td><td class="td-week week-sel">$1.14M</td><td class="td-week week-sel">$953K</td><td class="td-actual">$5.94M <span class="vs-goal below">-9%</span></td><td class="td-goal">$6.63M</td><td class="td-week week-sel">$1.05M</td><td class="td-week week-sel">$933K</td><td class="td-week week-sel">$304K</td><td class="td-week week-sel">$0</td><td class="td-actual">$3.26M <span class="vs-goal below">-51%</span></td></tr><tr class="tr-pct"><td class="td-metric">Gross Profit % Margin</td><td class="td-source"></td><td class="td-goal">74.0%</td><td class="td-week week-sel">72.6%</td><td class="td-week week-sel">73.1%</td><td class="td-week week-sel">70.3%</td><td class="td-week week-sel">72.4%</td><td class="td-actual">72.4% <span class="vs-goal below">-2%</span></td><td class="td-goal">79.4%</td><td class="td-week week-sel">73.7%</td><td class="td-week week-sel">72.4%</td><td class="td-week week-sel">72.2%</td><td class="td-week week-sel">75.4%</td><td class="td-actual">73.3% <span class="vs-goal below">-8%</span></td><td class="td-goal">79.4%</td><td class="td-week week-sel">73.4%</td><td class="td-week week-sel">63.6%</td><td class="td-week week-sel">72.6%</td><td class="td-week week-sel">72.5%</td><td class="td-actual">69.4% <span class="vs-goal below">-13%</span></td><td class="td-goal">79.4%</td><td class="td-week week-sel">65.5%</td><td class="td-week week-sel">71.9%</td><td class="td-week week-sel">72.1%</td><td class="td-week week-sel">—</td><td class="td-actual">68.8% <span class="vs-goal below">-13%</span></td></tr><tr class="tr-section"><td class="td-metric" colspan="26">Operating</td></tr><tr class=""><td class="td-metric">Ad Spend</td><td class="td-source">Amp Ad Spend, Sellerboard</td><td class="td-goal">$3.44M</td><td class="td-week week-sel">$900K</td><td class="td-week week-sel">$785K</td><td class="td-week week-sel">$922K</td><td class="td-week week-sel">$673K</td><td class="td-actual">$3.68M <span class="vs-goal below">+7%</span></td><td class="td-goal">$3.75M</td><td class="td-week week-sel">$798K</td><td class="td-week week-sel">$851K</td><td class="td-week week-sel">$900K</td><td class="td-week week-sel">$919K</td><td class="td-actual">$3.47M <span class="vs-goal above">-8%</span></td><td class="td-goal">$3.75M</td><td class="td-week week-sel">$1.04M</td><td class="td-week week-sel">$726K</td><td class="td-week week-sel">$819K</td><td class="td-week week-sel">$519K</td><td class="td-actual">$3.21M <span class="vs-goal above">-14%</span></td><td class="td-goal">$3.75M</td><td class="td-week week-sel">$299K</td><td class="td-week week-sel">$316K</td><td class="td-week week-sel">$50K</td><td class="td-week week-sel">$0</td><td class="td-actual">$950K <span class="vs-goal above">-75%</span></td></tr><tr class=""><td class="td-metric">Selling Fees (Merchant Fees &amp; Commissions)</td><td class="td-source">Estimate, Sellerboard</td><td class="td-goal">$528K</td><td class="td-week week-sel">$178K</td><td class="td-week week-sel">$149K</td><td class="td-week week-sel">$198K</td><td class="td-week week-sel">$150K</td><td class="td-actual">$733K <span class="vs-goal below">+39%</span></td><td class="td-goal">$496K</td><td class="td-week week-sel">$145K</td><td class="td-week week-sel">$164K</td><td class="td-week week-sel">$225K</td><td class="td-week week-sel">$135K</td><td class="td-actual">$670K <span class="vs-goal below">+35%</span></td><td class="td-goal">$572K</td><td class="td-week week-sel">$169K</td><td class="td-week week-sel">$150K</td><td class="td-week week-sel">$140K</td><td class="td-week week-sel">$115K</td><td class="td-actual">$617K <span class="vs-goal below">+8%</span></td><td class="td-goal">$585K</td><td class="td-week week-sel">$86K</td><td class="td-week week-sel">$144K</td><td class="td-week week-sel">$42K</td><td class="td-week week-sel">$0</td><td class="td-actual">$389K <span class="vs-goal above">-33%</span></td></tr><tr class="tr-subtotal"><td class="td-metric">Contribution Profit (EST)</td><td class="td-source"></td><td class="td-goal">$1.62M</td><td class="td-week week-sel">$465K</td><td class="td-week week-sel">$307K</td><td class="td-week week-sel">$87K</td><td class="td-week week-sel">$370K</td><td class="td-actual">$1.28M <span class="vs-goal below">-21%</span></td><td class="td-goal">$1.38M</td><td class="td-week week-sel">$352K</td><td class="td-week week-sel">$323K</td><td class="td-week week-sel">$364K</td><td class="td-week week-sel">$146K</td><td class="td-actual">$1.18M <span class="vs-goal below">-14%</span></td><td class="td-goal">$2.17M</td><td class="td-week week-sel">$231K</td><td class="td-week week-sel">$1.20M</td><td class="td-week week-sel">$178K</td><td class="td-week week-sel">$319K</td><td class="td-actual">$2.11M <span class="vs-goal below">-3%</span></td><td class="td-goal">$2.30M</td><td class="td-week week-sel">$661K</td><td class="td-week week-sel">$473K</td><td class="td-week week-sel">$212K</td><td class="td-week week-sel">$0</td><td class="td-actual">$1.92M <span class="vs-goal below">-16%</span></td></tr><tr class="tr-pct"><td class="td-metric">Contribution Margin % (EST)</td><td class="td-source"></td><td class="td-goal">21.4%</td><td class="td-week week-sel">21.9%</td><td class="td-week week-sel">18.1%</td><td class="td-week week-sel">5.1%</td><td class="td-week week-sel">22.4%</td><td class="td-actual">16.3% <span class="vs-goal below">-24%</span></td><td class="td-goal">19.5%</td><td class="td-week week-sel">20.0%</td><td class="td-week week-sel">17.4%</td><td class="td-week week-sel">17.7%</td><td class="td-week week-sel">9.2%</td><td class="td-actual">16.3% <span class="vs-goal below">-16%</span></td><td class="td-goal">26.6%</td><td class="td-week week-sel">11.8%</td><td class="td-week week-sel">36.7%</td><td class="td-week week-sel">11.3%</td><td class="td-week week-sel">24.3%</td><td class="td-actual">24.6% <span class="vs-goal below">-7%</span></td><td class="td-goal">27.5%</td><td class="td-week week-sel">41.4%</td><td class="td-week week-sel">36.4%</td><td class="td-week week-sel">50.3%</td><td class="td-week week-sel">—</td><td class="td-actual">40.6% <span class="vs-goal above">+47%</span></td></tr><tr class=""><td class="td-metric">OPEX (EST)</td><td class="td-source">Operating Plan (Estimate)</td><td class="td-goal">$1.13M</td><td class="td-week week-sel">$255K</td><td class="td-week week-sel">$255K</td><td class="td-week week-sel">$255K</td><td class="td-week week-sel">$255K</td><td class="td-actual">$1.13M <span class="vs-goal above">0%</span></td><td class="td-goal">$900K</td><td class="td-week week-sel">$225K</td><td class="td-week week-sel">$225K</td><td class="td-week week-sel">$225K</td><td class="td-week week-sel">$225K</td><td class="td-actual">$900K <span class="vs-goal above">0%</span></td><td class="td-goal">$900K</td><td class="td-week week-sel">$203K</td><td class="td-week week-sel">$203K</td><td class="td-week week-sel">$203K</td><td class="td-week week-sel">$203K</td><td class="td-actual">$900K <span class="vs-goal above">0%</span></td><td class="td-goal">$900K</td><td class="td-week week-sel">$210K</td><td class="td-week week-sel">$210K</td><td class="td-week week-sel">$210K</td><td class="td-week week-sel">$0</td><td class="td-actual">$900K <span class="vs-goal above">0%</span></td></tr><tr class="tr-total"><td class="td-metric">EBITDA (EST)</td><td class="td-source"></td><td class="td-goal">$486K</td><td class="td-week week-sel">$210K</td><td class="td-week week-sel">$52K</td><td class="td-week week-sel">($168K)</td><td class="td-week week-sel">$115K</td><td class="td-actual">$151K <span class="vs-goal below">-69%</span></td><td class="td-goal">$482K</td><td class="td-week week-sel">$127K</td><td class="td-week week-sel">$98K</td><td class="td-week week-sel">$139K</td><td class="td-week week-sel">($79K)</td><td class="td-actual">$284K <span class="vs-goal below">-41%</span></td><td class="td-goal">$1.27M</td><td class="td-week week-sel">$28K</td><td class="td-week week-sel">$994K</td><td class="td-week week-sel">($26K)</td><td class="td-week week-sel">$116K</td><td class="td-actual">$1.21M <span class="vs-goal below">-5%</span></td><td class="td-goal">$1.40M</td><td class="td-week week-sel">$451K</td><td class="td-week week-sel">$263K</td><td class="td-week week-sel">$2K</td><td class="td-week week-sel">$0</td><td class="td-actual">$1.02M <span class="vs-goal below">-27%</span></td></tr><tr class="tr-pct"><td class="td-metric">EBITDA % (EST)</td><td class="td-source"></td><td class="td-goal">6.4%</td><td class="td-week week-sel">9.9%</td><td class="td-week week-sel">3.1%</td><td class="td-week week-sel">-9.8%</td><td class="td-week week-sel">7.0%</td><td class="td-actual">1.9% <span class="vs-goal below">-70%</span></td><td class="td-goal">6.8%</td><td class="td-week week-sel">7.2%</td><td class="td-week week-sel">5.3%</td><td class="td-week week-sel">6.7%</td><td class="td-week week-sel">-4.9%</td><td class="td-actual">3.9% <span class="vs-goal below">-42%</span></td><td class="td-goal">15.6%</td><td class="td-week week-sel">1.4%</td><td class="td-week week-sel">30.5%</td><td class="td-week week-sel">-1.6%</td><td class="td-week week-sel">8.8%</td><td class="td-actual">14.1% <span class="vs-goal below">-9%</span></td><td class="td-goal">16.7%</td><td class="td-week week-sel">28.3%</td><td class="td-week week-sel">20.2%</td><td class="td-week week-sel">0.5%</td><td class="td-week week-sel">—</td><td class="td-actual">21.6% <span class="vs-goal above">+29%</span></td></tr><tr class="tr-section"><td class="td-metric" colspan="26">Marketing</td></tr><tr class="tr-pct"><td class="td-metric">ROAS (Net Revenue / Ad Spend)</td><td class="td-source"></td><td class="td-goal">2.19×</td><td class="td-week week-sel">2.36×</td><td class="td-week week-sel">2.16×</td><td class="td-week week-sel">1.86×</td><td class="td-week week-sel">2.45×</td><td class="td-actual">2.14× <span class="vs-goal above">-3%</span></td><td class="td-goal">1.89×</td><td class="td-week week-sel">2.20×</td><td class="td-week week-sel">2.17×</td><td class="td-week week-sel">2.29×</td><td class="td-week week-sel">1.73×</td><td class="td-actual">2.09× <span class="vs-goal below">+11%</span></td><td class="td-goal">2.18×</td><td class="td-week week-sel">1.89×</td><td class="td-week week-sel">4.49×</td><td class="td-week week-sel">1.91×</td><td class="td-week week-sel">2.53×</td><td class="td-actual">2.66× <span class="vs-goal below">+22%</span></td><td class="td-goal">2.23×</td><td class="td-week week-sel">5.35×</td><td class="td-week week-sel">4.10×</td><td class="td-week week-sel">8.45×</td><td class="td-week week-sel">—</td><td class="td-actual">4.99× <span class="vs-goal below">+124%</span></td></tr><tr class="tr-subtotal"><td class="td-metric">Total Ad Spend</td><td class="td-source">Shopify, Konnective</td><td class="td-goal">$3.44M</td><td class="td-week week-sel">$853K</td><td class="td-week week-sel">$755K</td><td class="td-week week-sel">$887K</td><td class="td-week week-sel">$641K</td><td class="td-actual">$3.52M <span class="vs-goal below">+2%</span></td><td class="td-goal">$3.75M</td><td class="td-week week-sel">$746K</td><td class="td-week week-sel">$772K</td><td class="td-week week-sel">$823K</td><td class="td-week week-sel">$869K</td><td class="td-actual">$3.21M <span class="vs-goal above">-14%</span></td><td class="td-goal">$3.75M</td><td class="td-week week-sel">$991K</td><td class="td-week week-sel">$684K</td><td class="td-week week-sel">$768K</td><td class="td-week week-sel">$480K</td><td class="td-actual">$3.02M <span class="vs-goal above">-20%</span></td><td class="td-goal">$3.75M</td><td class="td-week week-sel">$257K</td><td class="td-week week-sel">$252K</td><td class="td-week week-sel">$36K</td><td class="td-week week-sel">$0</td><td class="td-actual">$777K <span class="vs-goal above">-79%</span></td></tr><tr class="tr-pct"><td class="td-metric">Ad Spend % of Net Revenue</td><td class="td-source"></td><td class="td-goal">45.6%</td><td class="td-week week-sel">42.4%</td><td class="td-week week-sel">46.2%</td><td class="td-week week-sel">53.7%</td><td class="td-week week-sel">40.9%</td><td class="td-actual">46.8% <span class="vs-goal below">+3%</span></td><td class="td-goal">52.9%</td><td class="td-week week-sel">45.4%</td><td class="td-week week-sel">46.0%</td><td class="td-week week-sel">43.7%</td><td class="td-week week-sel">57.7%</td><td class="td-actual">47.8% <span class="vs-goal above">-10%</span></td><td class="td-goal">45.9%</td><td class="td-week week-sel">53.0%</td><td class="td-week week-sel">22.3%</td><td class="td-week week-sel">52.3%</td><td class="td-week week-sel">39.5%</td><td class="td-actual">37.6% <span class="vs-goal above">-18%</span></td><td class="td-goal">44.9%</td><td class="td-week week-sel">18.7%</td><td class="td-week week-sel">24.4%</td><td class="td-week week-sel">11.8%</td><td class="td-week week-sel">—</td><td class="td-actual">20.0% <span class="vs-goal above">-55%</span></td></tr><tr class=""><td class="td-metric">AOV (Net Revenue / Orders)</td><td class="td-source"></td><td class="td-goal">$0</td><td class="td-week week-sel">$133</td><td class="td-week week-sel">$126</td><td class="td-week week-sel">$99</td><td class="td-week week-sel">$132</td><td class="td-actual">$121</td><td class="td-goal">$121</td><td class="td-week week-sel">$124</td><td class="td-week week-sel">$116</td><td class="td-week week-sel">$108</td><td class="td-week week-sel">$125</td><td class="td-actual">$117 <span class="vs-goal below">-4%</span></td><td class="td-goal">$117</td><td class="td-week week-sel">$128</td><td class="td-week week-sel">$222</td><td class="td-week week-sel">$105</td><td class="td-week week-sel">$112</td><td class="td-actual">$141 <span class="vs-goal above">+20%</span></td><td class="td-goal">$141</td><td class="td-week week-sel">$204</td><td class="td-week week-sel">$97</td><td class="td-week week-sel">$112</td><td class="td-week week-sel">—</td><td class="td-actual">$133 <span class="vs-goal below">-6%</span></td></tr><tr class=""><td class="td-metric">Total Orders</td><td class="td-source">Hex, Sellerboard</td><td class="td-goal">$0</td><td class="td-week week-sel">$16K</td><td class="td-week week-sel">$14K</td><td class="td-week week-sel">$17K</td><td class="td-week week-sel">$12K</td><td class="td-actual">$65K</td><td class="td-goal">$58K</td><td class="td-week week-sel">$14K</td><td class="td-week week-sel">$16K</td><td class="td-week week-sel">$19K</td><td class="td-week week-sel">$13K</td><td class="td-actual">$62K <span class="vs-goal above">+6%</span></td><td class="td-goal">$70K</td><td class="td-week week-sel">$15K</td><td class="td-week week-sel">$15K</td><td class="td-week week-sel">$15K</td><td class="td-week week-sel">$12K</td><td class="td-actual">$61K <span class="vs-goal below">-13%</span></td><td class="td-goal">$59K</td><td class="td-week week-sel">$8K</td><td class="td-week week-sel">$13K</td><td class="td-week week-sel">$4K</td><td class="td-week week-sel">$0</td><td class="td-actual">$36K <span class="vs-goal below">-40%</span></td></tr><tr class=""><td class="td-metric">NCAC (Ad Spend / New Customer Orders)</td><td class="td-source"></td><td class="td-goal">$0</td><td class="td-week week-sel">$143</td><td class="td-week week-sel">$169</td><td class="td-week week-sel">$226</td><td class="td-week week-sel">$157</td><td class="td-actual">$170</td><td class="td-goal">$0</td><td class="td-week week-sel">$145</td><td class="td-week week-sel">$153</td><td class="td-week week-sel">$160</td><td class="td-week week-sel">$170</td><td class="td-actual">$157</td><td class="td-goal">$0</td><td class="td-week week-sel">$157</td><td class="td-week week-sel">$126</td><td class="td-week week-sel">$145</td><td class="td-week week-sel">$116</td><td class="td-actual">$135</td><td class="td-goal">$0</td><td class="td-week week-sel">$107</td><td class="td-week week-sel">$91</td><td class="td-week week-sel">$36</td><td class="td-week week-sel">—</td><td class="td-actual">$89</td></tr><tr class=""><td class="td-metric">CAC (Ad Spend / Total Orders)</td><td class="td-source"></td><td class="td-goal">$0</td><td class="td-week week-sel">$56</td><td class="td-week week-sel">$58</td><td class="td-week week-sel">$53</td><td class="td-week week-sel">$54</td><td class="td-actual">$57</td><td class="td-goal">$0</td><td class="td-week week-sel">$56</td><td class="td-week week-sel">$53</td><td class="td-week week-sel">$47</td><td class="td-week week-sel">$72</td><td class="td-actual">$56</td><td class="td-goal">$0</td><td class="td-week week-sel">$68</td><td class="td-week week-sel">$49</td><td class="td-week week-sel">$55</td><td class="td-week week-sel">$44</td><td class="td-actual">$53</td><td class="td-goal">$0</td><td class="td-week week-sel">$38</td><td class="td-week week-sel">$24</td><td class="td-week week-sel">$13</td><td class="td-week week-sel">—</td><td class="td-actual">$27</td></tr><tr class="tr-section"><td class="td-metric" colspan="26">Ad Channels</td></tr><tr class=""><td class="td-metric">Facebook Ad Spend</td><td class="td-source"></td><td class="td-goal">$2.01M</td><td class="td-week week-sel">$582K</td><td class="td-week week-sel">$485K</td><td class="td-week week-sel">$455K</td><td class="td-week week-sel">$448K</td><td class="td-actual">$2.20M <span class="vs-goal below">+9%</span></td><td class="td-goal">$2.33M</td><td class="td-week week-sel">$499K</td><td class="td-week week-sel">$529K</td><td class="td-week week-sel">$585K</td><td class="td-week week-sel">$591K</td><td class="td-actual">$2.20M <span class="vs-goal above">-5%</span></td><td class="td-goal">$2.33M</td><td class="td-week week-sel">$787K</td><td class="td-week week-sel">$489K</td><td class="td-week week-sel">$561K</td><td class="td-week week-sel">$284K</td><td class="td-actual">$2.13M <span class="vs-goal above">-8%</span></td><td class="td-goal">$2.33M</td><td class="td-week week-sel">$63K</td><td class="td-week week-sel">$60K</td><td class="td-week week-sel">$7K</td><td class="td-week week-sel">$0</td><td class="td-actual">$186K <span class="vs-goal above">-92%</span></td></tr><tr class=""><td class="td-metric">Google Ad Spend</td><td class="td-source"></td><td class="td-goal">$750K</td><td class="td-week week-sel">$202K</td><td class="td-week week-sel">$173K</td><td class="td-week week-sel">$164K</td><td class="td-week week-sel">$136K</td><td class="td-actual">$735K <span class="vs-goal above">-2%</span></td><td class="td-goal">$750K</td><td class="td-week week-sel">$163K</td><td class="td-week week-sel">$153K</td><td class="td-week week-sel">$148K</td><td class="td-week week-sel">$130K</td><td class="td-actual">$594K <span class="vs-goal above">-21%</span></td><td class="td-goal">$750K</td><td class="td-week week-sel">$133K</td><td class="td-week week-sel">$119K</td><td class="td-week week-sel">$128K</td><td class="td-week week-sel">$113K</td><td class="td-actual">$537K <span class="vs-goal above">-28%</span></td><td class="td-goal">$750K</td><td class="td-week week-sel">$104K</td><td class="td-week week-sel">$108K</td><td class="td-week week-sel">$16K</td><td class="td-week week-sel">$0</td><td class="td-actual">$327K <span class="vs-goal above">-56%</span></td></tr><tr class=""><td class="td-metric">TikTok Ad Spend</td><td class="td-source"></td><td class="td-goal">$25K</td><td class="td-week week-sel">$7K</td><td class="td-week week-sel">$5K</td><td class="td-week week-sel">$3K</td><td class="td-week week-sel">$5K</td><td class="td-actual">$20K <span class="vs-goal above">-18%</span></td><td class="td-goal">$25K</td><td class="td-week week-sel">$3K</td><td class="td-week week-sel">$2K</td><td class="td-week week-sel">$3K</td><td class="td-week week-sel">$3K</td><td class="td-actual">$11K <span class="vs-goal above">-55%</span></td><td class="td-goal">$25K</td><td class="td-week week-sel">$2K</td><td class="td-week week-sel">$2K</td><td class="td-week week-sel">$3K</td><td class="td-week week-sel">$4K</td><td class="td-actual">$14K <span class="vs-goal above">-45%</span></td><td class="td-goal">$25K</td><td class="td-week week-sel">$8K</td><td class="td-week week-sel">$8K</td><td class="td-week week-sel">$1K</td><td class="td-week week-sel">$0</td><td class="td-actual">$24K <span class="vs-goal above">-5%</span></td></tr><tr class=""><td class="td-metric">Amazon Ad Spend</td><td class="td-source"></td><td class="td-goal">$250K</td><td class="td-week week-sel">$47K</td><td class="td-week week-sel">$30K</td><td class="td-week week-sel">$36K</td><td class="td-week week-sel">$33K</td><td class="td-actual">$161K <span class="vs-goal above">-36%</span></td><td class="td-goal">$250K</td><td class="td-week week-sel">$53K</td><td class="td-week week-sel">$79K</td><td class="td-week week-sel">$77K</td><td class="td-week week-sel">$50K</td><td class="td-actual">$259K <span class="vs-goal below">+3%</span></td><td class="td-goal">$250K</td><td class="td-week week-sel">$46K</td><td class="td-week week-sel">$42K</td><td class="td-week week-sel">$51K</td><td class="td-week week-sel">$40K</td><td class="td-actual">$196K <span class="vs-goal above">-22%</span></td><td class="td-goal">$250K</td><td class="td-week week-sel">$42K</td><td class="td-week week-sel">$65K</td><td class="td-week week-sel">$14K</td><td class="td-week week-sel">$0</td><td class="td-actual">$173K <span class="vs-goal above">-31%</span></td></tr><tr class=""><td class="td-metric">Other Ad Spend</td><td class="td-source"></td><td class="td-goal">$400K</td><td class="td-week week-sel">$62K</td><td class="td-week week-sel">$93K</td><td class="td-week week-sel">$266K</td><td class="td-week week-sel">$52K</td><td class="td-actual">$564K <span class="vs-goal below">+41%</span></td><td class="td-goal">$400K</td><td class="td-week week-sel">$81K</td><td class="td-week week-sel">$88K</td><td class="td-week week-sel">$87K</td><td class="td-week week-sel">$145K</td><td class="td-actual">$401K <span class="vs-goal below">0%</span></td><td class="td-goal">$400K</td><td class="td-week week-sel">$69K</td><td class="td-week week-sel">$74K</td><td class="td-week week-sel">$76K</td><td class="td-week week-sel">$79K</td><td class="td-actual">$333K <span class="vs-goal above">-17%</span></td><td class="td-goal">$400K</td><td class="td-week week-sel">$82K</td><td class="td-week week-sel">$76K</td><td class="td-week week-sel">$11K</td><td class="td-week week-sel">$0</td><td class="td-actual">$240K <span class="vs-goal above">-40%</span></td></tr><tr class="tr-section"><td class="td-metric" colspan="26">Customers</td></tr><tr class=""><td class="td-metric">New Customer Net Revenue</td><td class="td-source">Hex (Shopify &amp; Konnektive)</td><td class="td-goal">—</td><td class="td-week week-sel">$790K</td><td class="td-week week-sel">$574K</td><td class="td-week week-sel">$477K</td><td class="td-week week-sel">$537K</td><td class="td-actual">$2.64M</td><td class="td-goal">—</td><td class="td-week week-sel">$663K</td><td class="td-week week-sel">$680K</td><td class="td-week week-sel">$699K</td><td class="td-week week-sel">$672K</td><td class="td-actual">$2.71M</td><td class="td-goal">—</td><td class="td-week week-sel">$824K</td><td class="td-week week-sel">$665K</td><td class="td-week week-sel">$575K</td><td class="td-week week-sel">$475K</td><td class="td-actual">$2.67M</td><td class="td-goal">—</td><td class="td-week week-sel">$303K</td><td class="td-week week-sel">$320K</td><td class="td-week week-sel">$122K</td><td class="td-week week-sel">$0</td><td class="td-actual">$1.07M</td></tr><tr class=""><td class="td-metric">New Customer Orders</td><td class="td-source">Hex (Shopify &amp; Konnektive)</td><td class="td-goal">—</td><td class="td-week week-sel">$6K</td><td class="td-week week-sel">$4K</td><td class="td-week week-sel">$4K</td><td class="td-week week-sel">$4K</td><td class="td-actual">$21K</td><td class="td-goal">—</td><td class="td-week week-sel">$5K</td><td class="td-week week-sel">$5K</td><td class="td-week week-sel">$5K</td><td class="td-week week-sel">$5K</td><td class="td-actual">$20K</td><td class="td-goal">—</td><td class="td-week week-sel">$6K</td><td class="td-week week-sel">$5K</td><td class="td-week week-sel">$5K</td><td class="td-week week-sel">$4K</td><td class="td-actual">$22K</td><td class="td-goal">—</td><td class="td-week week-sel">$2K</td><td class="td-week week-sel">$3K</td><td class="td-week week-sel">$982</td><td class="td-week week-sel">$0</td><td class="td-actual">$9K</td></tr><tr class=""><td class="td-metric">New Customer AOV</td><td class="td-source"></td><td class="td-goal">—</td><td class="td-week week-sel">$133</td><td class="td-week week-sel">$128</td><td class="td-week week-sel">$122</td><td class="td-week week-sel">$131</td><td class="td-actual">$128</td><td class="td-goal">—</td><td class="td-week week-sel">$129</td><td class="td-week week-sel">$135</td><td class="td-week week-sel">$136</td><td class="td-week week-sel">$131</td><td class="td-actual">$133</td><td class="td-goal">—</td><td class="td-week week-sel">$131</td><td class="td-week week-sel">$123</td><td class="td-week week-sel">$108</td><td class="td-week week-sel">$115</td><td class="td-actual">$120</td><td class="td-goal">—</td><td class="td-week week-sel">$127</td><td class="td-week week-sel">$116</td><td class="td-week week-sel">$124</td><td class="td-week week-sel">—</td><td class="td-actual">$121</td></tr><tr class=""><td class="td-metric">Repeat Customer Net Revenue</td><td class="td-source">Hex (Shopify &amp; Konnektive)</td><td class="td-goal">—</td><td class="td-week week-sel">$610K</td><td class="td-week week-sel">$458K</td><td class="td-week week-sel">$439K</td><td class="td-week week-sel">$433K</td><td class="td-actual">$2.11M</td><td class="td-goal">—</td><td class="td-week week-sel">$485K</td><td class="td-week week-sel">$531K</td><td class="td-week week-sel">$399K</td><td class="td-week week-sel">$379K</td><td class="td-actual">$1.79M</td><td class="td-goal">—</td><td class="td-week week-sel">$575K</td><td class="td-week week-sel">$618K</td><td class="td-week week-sel">$416K</td><td class="td-week week-sel">$415K</td><td class="td-actual">$2.14M</td><td class="td-goal">—</td><td class="td-week week-sel">$252K</td><td class="td-week week-sel">$343K</td><td class="td-week week-sel">$174K</td><td class="td-week week-sel">$0</td><td class="td-actual">$1.10M</td></tr><tr class=""><td class="td-metric">Repeat Customer Orders</td><td class="td-source">Hex (Shopify &amp; Konnektive)</td><td class="td-goal">—</td><td class="td-week week-sel">$4K</td><td class="td-week week-sel">$3K</td><td class="td-week week-sel">$3K</td><td class="td-week week-sel">$3K</td><td class="td-actual">$15K</td><td class="td-goal">—</td><td class="td-week week-sel">$4K</td><td class="td-week week-sel">$3K</td><td class="td-week week-sel">$3K</td><td class="td-week week-sel">$3K</td><td class="td-actual">$12K</td><td class="td-goal">—</td><td class="td-week week-sel">$4K</td><td class="td-week week-sel">$5K</td><td class="td-week week-sel">$3K</td><td class="td-week week-sel">$3K</td><td class="td-actual">$16K</td><td class="td-goal">—</td><td class="td-week week-sel">$2K</td><td class="td-week week-sel">$3K</td><td class="td-week week-sel">$1K</td><td class="td-week week-sel">$0</td><td class="td-actual">$8K</td></tr><tr class=""><td class="td-metric">Repeat Customer AOV</td><td class="td-source"></td><td class="td-goal">—</td><td class="td-week week-sel">$137</td><td class="td-week week-sel">$143</td><td class="td-week week-sel">$135</td><td class="td-week week-sel">$139</td><td class="td-actual">$138</td><td class="td-goal">—</td><td class="td-week week-sel">$137</td><td class="td-week week-sel">$169</td><td class="td-week week-sel">$142</td><td class="td-week week-sel">$150</td><td class="td-actual">$149</td><td class="td-goal">—</td><td class="td-week week-sel">$141</td><td class="td-week week-sel">$135</td><td class="td-week week-sel">$135</td><td class="td-week week-sel">$132</td><td class="td-actual">$136</td><td class="td-goal">—</td><td class="td-week week-sel">$145</td><td class="td-week week-sel">$134</td><td class="td-week week-sel">$125</td><td class="td-week week-sel">—</td><td class="td-actual">$135</td></tr></tbody></table></div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="footer">
+  <div class="footer-logo">BLISSY™</div>
+  <div class="footer-text">Executive Dashboard · 2026 · Confidential · Hex, Sellerboard, AMP</div>
+</footer>
+
+<script>
+// ══════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════
+const RAW = [{"metric":"Gross Revenue","source":"Hex, Sellerboard","jan":{"goal":10272142.395281,"w1":2777249.413847,"w2":2146789.932461,"w3":2587912.614409,"w4":2440618.783583,"remainder":975904.147567,"actual":10928474.891866},"feb":{"goal":9651030.726511,"w1":2612055.251008,"w2":2588084.6,"w3":2965086.715,"w4":2160442.085,"remainder":null,"actual":10325668.651008},"mar":{"goal":11137245.195419,"w1":2966614.041562,"w2":4649038.322985,"w3":2235786.145,"w4":1983682.35,"remainder":645748.02,"actual":12480868.879548},"apr":{"goal":11373881.863436,"w1":2154655.5,"w2":1884375.59,"w3":701722.08,"w4":0.0,"remainder":0.0,"actual":6772504.528571}},{"metric":"Shipping Revenue","source":"Hex, Sellerboard","jan":{"goal":61935.640151,"w1":17111.14,"w2":12551.99,"w3":12328.76,"w4":13241.03,"remainder":5554.21,"actual":60787.13},"feb":{"goal":58190.662002,"w1":15810.0,"w2":14312.21,"w3":12530.97,"w4":12051.78,"remainder":null,"actual":54704.96},"mar":{"goal":67151.757068,"w1":18153.49,"w2":17158.65,"w3":12703.36,"w4":11686.48,"remainder":2033.01,"actual":61734.99},"apr":{"goal":68578.552273,"w1":4243.86,"w2":6873.66,"w3":3766.11,"w4":0.0,"remainder":0.0,"actual":21262.328571}},{"metric":"Discounts","source":"Hex, Sellerboard","jan":{"goal":-2382654.069945,"w1":-554722.77,"w2":-367034.755,"w3":-807439.67,"w4":-719899.885,"remainder":-266504.485,"actual":-2715601.565},"feb":{"goal":-2238585.365624,"w1":-780068.78,"w2":-656257.1,"w3":-812273.985,"w4":-491592.555,"remainder":null,"actual":-2740192.42},"mar":{"goal":-2583317.245002,"w1":-920068.67,"w2":-1321285.48,"w3":-613795.105,"w4":-627452.49,"remainder":-178567.99,"actual":-3661169.735},"apr":{"goal":-2638205.826025,"w1":-525439.13,"w2":-560615.12,"w3":-268181.38,"w4":0.0,"remainder":0.0,"actual":-1934622.328571}},{"metric":"Refunds","source":"Hex, Sellerboard","jan":{"goal":-409123.965487,"w1":-114442.437267,"w2":-92956.673346,"w3":-76351.599696,"w4":-86566.046984,"remainder":-35638.004291,"actual":-405954.761584},"feb":{"goal":-384386.022888,"w1":-90267.99221,"w2":-97118.250813,"w3":-104744.928457,"w4":-88917.368378,"remainder":null,"actual":-381048.539858},"mar":{"goal":-443579.707486,"w1":-105427.934568,"w2":-85995.129632,"w3":-69081.836494,"w4":-53732.327494,"remainder":-16883.588882,"actual":-331120.81707},"apr":{"goal":-453004.589684,"w1":-36438.182539,"w2":-32778.386498,"w3":-15227.311202,"w4":0.0,"remainder":0.0,"actual":-120634.114627}},{"metric":"Net Revenue ","source":"","jan":{"goal":7542300.0,"w1":2125195.34658,"w2":1699350.494114,"w3":1716450.104712,"w4":1647393.881599,"remainder":679315.868276,"actual":7867705.695282},"feb":{"goal":7086250.0,"w1":1757528.478799,"w2":1849021.459187,"w3":2060598.771543,"w4":1591983.941622,"remainder":null,"actual":7259132.65115},"mar":{"goal":8177500.0,"w1":1959270.926994,"w2":3258916.363354,"w3":1565612.563506,"w4":1314184.012506,"remainder":452329.451118,"actual":8550313.317478},"apr":{"goal":8351250.0,"w1":1597022.047461,"w2":1297855.743502,"w3":422079.498798,"w4":0.0,"remainder":0.0,"actual":4738510.413944}},{"metric":"COGS - Product","source":"Hex, Sellerboard","jan":{"goal":1659306.0,"w1":478772.710889,"w2":372763.697188,"w3":412993.271118,"w4":382412.943517,"remainder":138893.670134,"actual":1785836.292847},"feb":{"goal":1189789.003522,"w1":379663.923484,"w2":418488.324252,"w3":464624.443328,"w4":318439.118532,"remainder":null,"actual":1581215.809596},"mar":{"goal":1373011.053279,"w1":429154.281181,"w2":1097683.997881,"w3":347748.518906,"w4":294199.952881,"remainder":96720.43978,"actual":2265507.190629},"apr":{"goal":1402183.865326,"w1":507299.859065,"w2":309494.549937,"w3":99537.349841,"w4":0.0,"remainder":0.0,"actual":1309045.369775}},{"metric":"COGS - Shipping","source":"Hex, Sellerboard","jan":{"goal":301692.0,"w1":102766.403333,"w2":85144.218333,"w3":96060.695,"w4":71742.195,"remainder":30676.015,"actual":386389.526667},"feb":{"goal":268321.155402,"w1":83357.015,"w2":92295.57,"w3":107208.36,"w4":73026.660008,"remainder":null,"actual":355887.605008},"mar":{"goal":309641.38272,"w1":91846.715,"w2":87528.65,"w3":81438.533333,"w4":67162.666667,"remainder":21793.84,"actual":349770.405},"apr":{"goal":316220.433805,"w1":43980.697507,"w2":55127.385007,"w3":18290.38,"w4":0.0,"remainder":0.0,"actual":167712.089306}},{"metric":"Gross Profit","source":"","jan":{"goal":5581302.0,"w1":1543656.232357,"w2":1241442.578593,"w3":1207396.138594,"w4":1193238.743082,"remainder":509746.183142,"actual":5695479.875768},"feb":{"goal":5628139.841076,"w1":1294507.540315,"w2":1338237.564934,"w3":1488765.968215,"w4":1200518.163082,"remainder":null,"actual":5322029.236546},"mar":{"goal":6494847.564001,"w1":1438269.930813,"w2":2073703.715473,"w3":1136425.511266,"w4":952821.392958,"remainder":333815.171338,"actual":5935035.721848},"apr":{"goal":6632845.700869,"w1":1045741.490889,"w2":933233.808558,"w3":304251.768958,"w4":0.0,"remainder":0.0,"actual":3261752.954863}},{"metric":"Gross Profit % Margin","source":"","jan":{"goal":0.74,"w1":0.72636,"w2":0.730539,"w3":0.703426,"w4":0.724319,"remainder":0.750382,"actual":0.723906},"feb":{"goal":0.794234,"w1":0.73655,"w2":0.723754,"w3":0.722492,"w4":0.754102,"remainder":null,"actual":0.733149},"mar":{"goal":0.794234,"w1":0.734084,"w2":0.636317,"w3":0.725866,"w4":0.725029,"remainder":0.737991,"actual":0.694131},"apr":{"goal":0.794234,"w1":0.654807,"w2":0.719058,"w3":0.72084,"w4":null,"remainder":null,"actual":0.68835}},{"metric":"Ad Spend","source":"Amp Ad Spend, Sellerboard","jan":{"goal":3437000.0,"w1":900074.3,"w2":785386.53,"w3":922312.44,"w4":673477.24,"remainder":400559.94,"actual":3681810.45},"feb":{"goal":3750000.0,"w1":798114.94,"w2":851381.59,"w3":899739.97,"w4":918849.42,"remainder":null,"actual":3468085.92},"mar":{"goal":3750000.0,"w1":1037527.99,"w2":726036.8,"w3":818722.6,"w4":519269.38,"remainder":110702.63,"actual":3212259.4},"apr":{"goal":3750000.0,"w1":298668.17,"w2":316323.77,"w3":49946.1,"w4":0.0,"remainder":0.0,"actual":949911.485714}},{"metric":"Selling Fees (Merchant Fees & Commissions)","source":"Estimate, Sellerboard","jan":{"goal":527961.0,"w1":178291.718861,"w2":148560.978188,"w3":197855.25243,"w4":149985.053512,"remainder":57930.758179,"actual":732623.76117},"feb":{"goal":496037.5,"w1":144645.335016,"w2":164351.932343,"w3":225103.161608,"w4":135420.926614,"remainder":null,"actual":669521.355581},"mar":{"goal":572425.0,"w1":169300.98709,"w2":150064.835935,"w3":140070.540745,"w4":114699.491075,"remainder":42573.618078,"actual":616709.472923},"apr":{"goal":584587.5,"w1":85880.270222,"w2":144369.700245,"w3":42185.537516,"w4":0.0,"remainder":0.0,"actual":389193.582833}},{"metric":"Contribution Profit (EST)","source":"","jan":{"goal":1616341.0,"w1":465290.213496,"w2":307495.070405,"w3":87228.446164,"w4":369776.44957,"remainder":51255.484962,"actual":1281045.664598},"feb":{"goal":1382102.341076,"w1":351747.265299,"w2":322504.042591,"w3":363922.836607,"w4":146247.816469,"remainder":null,"actual":1184421.960966},"mar":{"goal":2172422.564001,"w1":231440.953724,"w2":1197602.079538,"w3":177632.370521,"w4":318852.521883,"remainder":180538.92326,"actual":2106066.848925},"apr":{"goal":2298258.200869,"w1":661193.050667,"w2":472540.338313,"w3":212120.131442,"w4":0.0,"remainder":0.0,"actual":1922647.886316}},{"metric":"Contribution Margin % (EST)","source":"","jan":{"goal":0.214303,"w1":0.21894,"w2":0.180949,"w3":0.050819,"w4":0.224461,"remainder":0.075452,"actual":0.162823},"feb":{"goal":0.19504,"w1":0.200137,"w2":0.174419,"w3":0.17661,"w4":0.091865,"remainder":null,"actual":0.163163},"mar":{"goal":0.265659,"w1":0.118126,"w2":0.367485,"w3":0.113459,"w4":0.242624,"remainder":0.399131,"actual":0.246315},"apr":{"goal":0.275199,"w1":0.414016,"w2":0.364093,"w3":0.50256,"w4":null,"remainder":null,"actual":0.405749}},{"metric":"OPEX (EST)","source":"Operating Plan (Estimate)","jan":{"goal":1130000.0,"w1":255161.290323,"w2":255161.290323,"w3":255161.290323,"w4":255161.290323,"remainder":109354.83871,"actual":1130000.0},"feb":{"goal":900000.0,"w1":225000.0,"w2":225000.0,"w3":225000.0,"w4":225000.0,"remainder":null,"actual":900000.0},"mar":{"goal":900000.0,"w1":203225.806452,"w2":203225.806452,"w3":203225.806452,"w4":203225.806452,"remainder":87096.774194,"actual":900000.0},"apr":{"goal":900000.0,"w1":210000.0,"w2":210000.0,"w3":210000.0,"w4":0.0,"remainder":0.0,"actual":900000.0}},{"metric":"EBITDA (EST)","source":"","jan":{"goal":486341.0,"w1":210128.923174,"w2":52333.780083,"w3":-167932.844158,"w4":114615.159247,"remainder":-58099.353747,"actual":151045.664598},"feb":{"goal":482102.341076,"w1":126747.265299,"w2":97504.042591,"w3":138922.836607,"w4":-78752.183531,"remainder":null,"actual":284421.960966},"mar":{"goal":1272422.564001,"w1":28215.147272,"w2":994376.273086,"w3":-25593.435931,"w4":115626.715431,"remainder":93442.149066,"actual":1206066.848925},"apr":{"goal":1398258.200869,"w1":451193.050667,"w2":262540.338313,"w3":2120.131442,"w4":0.0,"remainder":0.0,"actual":1022647.886316}},{"metric":"EBITDA % (EST)","source":"","jan":{"goal":0.064482,"w1":0.098875,"w2":0.030796,"w3":-0.097837,"w4":0.069574,"remainder":-0.085526,"actual":0.019198},"feb":{"goal":0.068033,"w1":0.072117,"w2":0.052733,"w3":0.067419,"w4":-0.049468,"remainder":null,"actual":0.039181},"mar":{"goal":0.1556,"w1":0.014401,"w2":0.305125,"w3":-0.016347,"w4":0.087984,"remainder":0.20658,"actual":0.141055},"apr":{"goal":0.167431,"w1":0.282521,"w2":0.202288,"w3":0.005023,"w4":null,"remainder":null,"actual":0.215816}},{"metric":"Discounts % of Gross Revenue","source":"","jan":{"goal":0.231953,"w1":0.199738,"w2":0.170969,"w3":0.312004,"w4":0.294966,"remainder":0.273085,"actual":0.248489},"feb":{"goal":0.231953,"w1":0.298642,"w2":0.253569,"w3":0.273946,"w4":0.227543,"remainder":null,"actual":0.265377},"mar":{"goal":0.231953,"w1":0.310141,"w2":0.284206,"w3":0.274532,"w4":0.316307,"remainder":0.276529,"actual":0.293343},"apr":{"goal":0.231953,"w1":0.243862,"w2":0.297507,"w3":0.382176,"w4":null,"remainder":null,"actual":0.285658}},{"metric":"Refunds % of Gross Revenue","source":"","jan":{"goal":0.039828,"w1":0.041207,"w2":0.0433,"w3":0.029503,"w4":0.035469,"remainder":0.036518,"actual":0.037147},"feb":{"goal":0.039828,"w1":0.034558,"w2":0.037525,"w3":0.035326,"w4":0.041157,"remainder":null,"actual":0.036903},"mar":{"goal":0.039828,"w1":0.035538,"w2":0.018497,"w3":0.030898,"w4":0.027087,"remainder":0.026146,"actual":0.02653},"apr":{"goal":0.039828,"w1":0.016911,"w2":0.017395,"w3":0.0217,"w4":null,"remainder":null,"actual":0.017812}},{"metric":"AOV (Net Revenue / Orders)","source":"","jan":{"goal":0.0,"w1":133.107563,"w2":125.515215,"w3":98.725992,"w4":132.182772,"remainder":124.98912,"actual":121.435825},"feb":{"goal":121.435825,"w1":123.621613,"w2":115.592739,"w3":108.037476,"w4":124.822326,"remainder":null,"actual":117.007296},"mar":{"goal":117.007296,"w1":127.523492,"w2":222.102935,"w3":104.891636,"w4":112.496491,"remainder":108.057681,"actual":140.558487},"apr":{"goal":140.558487,"w1":204.353429,"w2":96.58102,"w3":112.255186,"w4":null,"remainder":null,"actual":132.609335}},{"metric":"Total Orders","source":"Hex, Sellerboard","jan":{"goal":0.0,"w1":15966.0,"w2":13539.0,"w3":17386.0,"w4":12463.0,"remainder":5435.0,"actual":64789.0},"feb":{"goal":58353.866938,"w1":14217.0,"w2":15996.0,"w3":19073.0,"w4":12754.0,"remainder":null,"actual":62040.0},"mar":{"goal":69888.804129,"w1":15364.0,"w2":14673.0,"w3":14926.0,"w4":11682.0,"remainder":4186.0,"actual":60831.0},"apr":{"goal":59414.768779,"w1":7815.0,"w2":13438.0,"w3":3760.0,"w4":0.0,"remainder":0.0,"actual":35732.857143}},{"metric":"NCAC (Ad Spend / New Customer Orders)","source":"","jan":{"goal":0.0,"w1":143.083886,"w2":169.129022,"w3":226.307323,"w4":156.908528,"remainder":172.102179,"actual":170.366327},"feb":{"goal":0.0,"w1":145.193866,"w2":153.039996,"w3":160.086069,"w4":169.698133,"remainder":null,"actual":157.012721},"mar":{"goal":0.0,"w1":157.104505,"w2":126.028172,"w3":144.54573,"w4":115.785881,"remainder":84.883727,"actual":135.305708},"apr":{"goal":0.0,"w1":107.328683,"w2":90.999012,"w3":36.300733,"w4":null,"remainder":null,"actual":88.60868}},{"metric":"CAC (Ad Spend / Total Orders)","source":"","jan":{"goal":0.0,"w1":56.374439,"w2":58.009198,"w3":53.049145,"w4":54.038132,"remainder":73.700081,"actual":56.827709},"feb":{"goal":0.0,"w1":56.13807,"w2":53.224656,"w3":47.17349,"w4":72.044019,"remainder":null,"actual":55.900805},"mar":{"goal":0.0,"w1":67.529809,"w2":49.481142,"w3":54.85211,"w4":44.450383,"remainder":26.445922,"actual":52.80629},"apr":{"goal":0.0,"w1":38.217296,"w2":23.539498,"w3":13.283537,"w4":null,"remainder":null,"actual":26.583698}},{"metric":"Total Ad Spend","source":"Shopify, Konnective","jan":{"goal":3437000.0,"w1":852779.96,"w2":755499.34,"w3":886672.09,"w4":640500.61,"remainder":385508.88,"actual":3520960.88},"feb":{"goal":3750000.0,"w1":745570.5,"w2":772392.86,"w3":822522.22,"w4":868854.44,"remainder":null,"actual":3209340.02},"mar":{"goal":3750000.0,"w1":991486.53,"w2":683828.86,"w3":767826.92,"w4":479585.12,"remainder":93372.1,"actual":3016099.53},"apr":{"goal":3750000.0,"w1":256622.88,"w2":251521.27,"w3":35647.32,"w4":0.0,"remainder":0.0,"actual":776844.957143}},{"metric":"Ad Spend % of Net Revenue","source":"","jan":{"goal":0.455697,"w1":0.423525,"w2":0.462169,"w3":0.537337,"w4":0.408814,"remainder":0.589652,"actual":0.467965},"feb":{"goal":0.529194,"w1":0.454112,"w2":0.46045,"w3":0.43664,"w4":0.577173,"remainder":null,"actual":0.477755},"mar":{"goal":0.458575,"w1":0.529548,"w2":0.222785,"w3":0.522941,"w4":0.395127,"remainder":0.244739,"actual":0.375689},"apr":{"goal":0.449035,"w1":0.187016,"w2":0.243728,"w3":0.118333,"w4":null,"remainder":null,"actual":0.200466}},{"metric":"dMER (Ad Spend / Demand Rev)","source":"","jan":{"goal":0.43225,"w1":0.401884,"w2":0.438199,"w3":0.514453,"w4":0.388404,"remainder":0.56026,"actual":0.445004},"feb":{"goal":0.501965,"w1":0.431928,"w2":0.437472,"w3":0.415518,"w4":0.546641,"remainder":null,"actual":0.453927},"mar":{"goal":0.43498,"w1":0.502508,"w2":0.217057,"w3":0.500841,"w4":0.379606,"remainder":0.235933,"actual":0.361683},"apr":{"goal":0.42593,"w1":0.182844,"w2":0.237724,"w3":0.114213,"w4":null,"remainder":null,"actual":0.195489}},{"metric":"Facebook Ad Spend","source":"","jan":{"goal":2012000.0,"w1":582256.81,"w2":485159.54,"w3":454687.34,"w4":448220.95,"remainder":230660.49,"actual":2200985.13},"feb":{"goal":2325000.0,"w1":498841.27,"w2":529338.49,"w3":584602.18,"w4":590695.17,"remainder":null,"actual":2203477.11},"mar":{"goal":2325000.0,"w1":786855.83,"w2":488764.66,"w3":560816.52,"w4":283732.69,"remainder":12513.22,"actual":2132682.92},"apr":{"goal":2325000.0,"w1":62969.88,"w2":60120.5,"w3":7420.65,"w4":0.0,"remainder":0.0,"actual":186444.328571}},{"metric":"Google Ad Spend","source":"","jan":{"goal":750000.0,"w1":201905.26,"w2":172772.15,"w3":163765.7,"w4":135611.9,"remainder":61064.21,"actual":735119.22},"feb":{"goal":750000.0,"w1":163104.97,"w2":153177.26,"w3":147581.71,"w4":130164.19,"remainder":null,"actual":594028.13},"mar":{"goal":750000.0,"w1":133283.48,"w2":119288.54,"w3":127549.56,"w4":112971.71,"remainder":44007.49,"actual":537100.78},"apr":{"goal":750000.0,"w1":103922.57,"w2":108224.07,"w3":16434.47,"w4":0.0,"remainder":0.0,"actual":326544.442857}},{"metric":"TikTok Ad Spend","source":"","jan":{"goal":25000.0,"w1":6931.67,"w2":4565.61,"w3":2549.26,"w4":4684.58,"remainder":1670.54,"actual":20401.66},"feb":{"goal":25000.0,"w1":2542.17,"w2":2100.0,"w3":3099.49,"w4":3493.27,"remainder":null,"actual":11234.93},"mar":{"goal":25000.0,"w1":2332.48,"w2":2096.06,"w3":3306.82,"w4":4203.28,"remainder":1741.96,"actual":13680.6},"apr":{"goal":25000.0,"w1":7917.43,"w2":7649.09,"w3":1132.04,"w4":0.0,"remainder":0.0,"actual":23855.085714}},{"metric":"Other Ad Spend","source":"","jan":{"goal":400000.0,"w1":61686.22,"w2":93002.04,"w3":265669.79,"w4":51983.18,"remainder":92113.64,"actual":564454.87},"feb":{"goal":400000.0,"w1":81082.09,"w2":87777.11,"w3":87238.84,"w4":144501.81,"remainder":null,"actual":400599.85},"mar":{"goal":400000.0,"w1":69014.74,"w2":73679.6,"w3":76154.02,"w4":78677.44,"remainder":35109.43,"actual":332635.23},"apr":{"goal":400000.0,"w1":81813.0,"w2":75527.61,"w3":10660.16,"w4":0.0,"remainder":0.0,"actual":240001.1}},{"metric":"Amazon Ad Spend","source":"","jan":{"goal":250000.0,"w1":47294.34,"w2":29887.19,"w3":35640.35,"w4":32976.63,"remainder":15051.06,"actual":160849.57},"feb":{"goal":250000.0,"w1":52544.44,"w2":78988.73,"w3":77217.75,"w4":49994.98,"remainder":null,"actual":258745.9},"mar":{"goal":250000.0,"w1":46041.46,"w2":42207.94,"w3":50895.68,"w4":39684.26,"remainder":17330.53,"actual":196159.87},"apr":{"goal":250000.0,"w1":42045.29,"w2":64802.5,"w3":14298.78,"w4":0.0,"remainder":0.0,"actual":173066.528571}},{"metric":"ROAS (Net Revenue / Ad Spend)","source":"","jan":{"goal":2.194443,"w1":2.361133,"w2":2.163712,"w3":1.861029,"w4":2.446102,"remainder":1.695916,"actual":2.136912},"feb":{"goal":1.889667,"w1":2.202099,"w2":2.171789,"w3":2.290216,"w4":1.732584,"remainder":null,"actual":2.093124},"mar":{"goal":2.180667,"w1":1.888403,"w2":4.488638,"w3":1.912263,"w4":2.530833,"remainder":4.085986,"actual":2.661775},"apr":{"goal":2.227,"w1":5.347145,"w2":4.102935,"w3":8.4507,"w4":null,"remainder":null,"actual":4.98837}},{"metric":"New Customer Net Revenue","source":"Hex (Shopify & Konnektive)","jan":{"goal":null,"w1":789871.362534,"w2":573558.604333,"w3":477081.09681,"w4":536667.828892,"remainder":266980.61215,"actual":2644159.50472},"feb":{"goal":null,"w1":663428.344596,"w2":679503.06717,"w3":698500.569097,"w4":671911.509191,"remainder":null,"actual":2713343.490054},"mar":{"goal":null,"w1":824329.066124,"w2":665256.011128,"w3":575045.536036,"w4":474522.52096,"remainder":133323.193123,"actual":2672476.327372},"apr":{"goal":null,"w1":303305.880574,"w2":320191.92328,"w3":122016.549784,"w4":0.0,"remainder":0.0,"actual":1065020.505198}},{"metric":"New Customer Orders","source":"Hex (Shopify & Konnektive)","jan":{"goal":null,"w1":5960.0,"w2":4467.0,"w3":3918.0,"w4":4082.0,"remainder":2240.0,"actual":20667.0},"feb":{"goal":null,"w1":5135.0,"w2":5047.0,"w3":5138.0,"w4":5120.0,"remainder":null,"actual":20440.0},"mar":{"goal":null,"w1":6311.0,"w2":5426.0,"w3":5312.0,"w4":4142.0,"remainder":1100.0,"actual":22291.0},"apr":{"goal":null,"w1":2391.0,"w2":2764.0,"w3":982.0,"w4":0.0,"remainder":0.0,"actual":8767.142857}},{"metric":"New Customer AOV","source":"","jan":{"goal":null,"w1":132.528752,"w2":128.399061,"w3":121.766487,"w4":131.471786,"remainder":119.187773,"actual":127.941138},"feb":{"goal":null,"w1":129.197341,"w2":134.635044,"w3":135.94795,"w4":131.232717,"remainder":null,"actual":132.746746},"mar":{"goal":null,"w1":130.617821,"w2":122.605236,"w3":108.254054,"w4":114.563622,"remainder":121.202903,"actual":119.890374},"apr":{"goal":null,"w1":126.85315,"w2":115.843677,"w3":124.253106,"w4":null,"remainder":null,"actual":121.47863}},{"metric":"Repeat Customer Net Revenue","source":"Hex (Shopify & Konnektive)","jan":{"goal":null,"w1":610383.42597,"w2":457953.531385,"w3":439213.408922,"w4":433059.65832,"remainder":169485.329404,"actual":2110095.354001},"feb":{"goal":null,"w1":484841.09703,"w2":531434.734625,"w3":398637.158772,"w4":379439.105074,"remainder":null,"actual":1794352.095501},"mar":{"goal":null,"w1":575415.66847,"w2":618053.35949,"w3":416246.994493,"w4":415200.245836,"remainder":117893.053205,"actual":2142809.321494},"apr":{"goal":null,"w1":252061.505345,"w2":343405.439108,"w3":173903.281193,"w4":0.0,"remainder":0.0,"actual":1099100.322352}},{"metric":"Repeat Customer Orders","source":"Hex (Shopify & Konnektive)","jan":{"goal":null,"w1":4447.0,"w2":3196.0,"w3":3248.0,"w4":3125.0,"remainder":1221.0,"actual":15237.0},"feb":{"goal":null,"w1":3534.0,"w2":3153.0,"w3":2813.0,"w4":2532.0,"remainder":null,"actual":12032.0},"mar":{"goal":null,"w1":4085.0,"w2":4584.0,"w3":3078.0,"w4":3145.0,"remainder":903.0,"actual":15795.0},"apr":{"goal":null,"w1":1744.0,"w2":2558.0,"w3":1388.0,"w4":0.0,"remainder":0.0,"actual":8128.571429}},{"metric":"Repeat Customer AOV","source":"","jan":{"goal":null,"w1":137.257348,"w2":143.289591,"w3":135.225803,"w4":138.579091,"remainder":138.808624,"actual":138.484961},"feb":{"goal":null,"w1":137.193293,"w2":168.548917,"w3":141.712463,"w4":149.857466,"remainder":null,"actual":149.131657},"mar":{"goal":null,"w1":140.860629,"w2":134.828394,"w3":135.232942,"w4":132.019156,"remainder":130.557091,"actual":135.663775},"apr":{"goal":null,"w1":144.53068,"w2":134.247631,"w3":125.290548,"w4":null,"remainder":null,"actual":135.214451}}];
+
+// Index by metric name
+const byMetric = {};
+RAW.forEach(m => { byMetric[m.metric.trim()] = m; });
+
+const MONTHS = ['jan','feb','mar','apr'];
+const MONTH_LABELS = {jan:'January 2026',feb:'February 2026',mar:'March 2026',apr:'April 2026 (PTD)'};
+const MONTH_SHORT = {jan:'Jan',feb:'Feb',mar:'Mar',apr:'Apr'};
+const WEEKS = ['w1','w2','w3','w4'];
+const WEEK_LABELS = {w1:'Week 1',w2:'Week 2',w3:'Week 3',w4:'Week 4'};
+
+// Week start dates
+const WEEK_DATES = {
+  jan:{w1:'Jan 1–7',w2:'Jan 8–14',w3:'Jan 15–21',w4:'Jan 22–28'},
+  feb:{w1:'Feb 1–7',w2:'Feb 8–14',w3:'Feb 15–21',w4:'Feb 22–28'},
+  mar:{w1:'Mar 1–7',w2:'Mar 8–14',w3:'Mar 15–21',w4:'Mar 22–28'},
+  apr:{w1:'Apr 1–7',w2:'Apr 8–14',w3:'Apr 15–21',w4:'Apr 22–28'},
+};
+
+// ── STATE ──
+let state = {
+  month: 'all',
+  selectedWeeks: [],
+  compare: false,
+  section: 'pl',
+};
+
+// ── SECTION METRIC GROUPS ──
+const SECTIONS = {
+  pl: {
+    title:'Revenue & Margin', sub:'Consolidated',
+    groups:[
+      {label:'Revenue', metrics:['Gross Revenue','Shipping Revenue','Discounts','Refunds','Net Revenue ']},
+      {label:'Margin', metrics:['Gross Profit % Margin','Discounts % of Gross Revenue','Refunds % of Gross Revenue']},
+    ],
+    subtotals:['Net Revenue '],
+    charts:['Gross Revenue','EBITDA (EST)','ROAS (Net Revenue / Ad Spend)'],
+  },
+  costs: {
+    title:'COGS & Gross Profit', sub:'Cost Structure',
+    groups:[
+      {label:'COGS', metrics:['COGS - Product','COGS - Shipping','Gross Profit','Gross Profit % Margin']},
+    ],
+    subtotals:['Gross Profit'],
+    charts:['Gross Profit','Gross Profit % Margin','Net Revenue '],
+  },
+  opex: {
+    title:'OpEx & EBITDA', sub:'Profitability',
+    groups:[
+      {label:'Operating', metrics:['Ad Spend','Selling Fees (Merchant Fees & Commissions)','Contribution Profit (EST)','Contribution Margin % (EST)','OPEX (EST)','EBITDA (EST)','EBITDA % (EST)']},
+    ],
+    subtotals:['Contribution Profit (EST)','EBITDA (EST)'],
+    charts:['EBITDA (EST)','Contribution Profit (EST)','ROAS (Net Revenue / Ad Spend)'],
+  },
+  mkt: {
+    title:'ROAS & Efficiency', sub:'Marketing',
+    groups:[
+      {label:'Marketing KPIs', metrics:['ROAS (Net Revenue / Ad Spend)','Total Ad Spend','Ad Spend % of Net Revenue','dMER (Ad Spend / Demand Rev)','AOV (Net Revenue / Orders)','Total Orders','NCAC (Ad Spend / New Customer Orders)','CAC (Ad Spend / Total Orders)']},
+    ],
+    subtotals:[],
+    charts:['ROAS (Net Revenue / Ad Spend)','AOV (Net Revenue / Orders)','Total Orders'],
+  },
+  adspend: {
+    title:'Ad Spend by Channel', sub:'Media Mix',
+    groups:[
+      {label:'Channels', metrics:['Facebook Ad Spend','Google Ad Spend','TikTok Ad Spend','Amazon Ad Spend','Other Ad Spend','Total Ad Spend']},
+    ],
+    subtotals:['Total Ad Spend'],
+    charts:['Facebook Ad Spend','Google Ad Spend','TikTok Ad Spend'],
+  },
+  customers: {
+    title:'New vs Repeat Customers', sub:'Customer Economics',
+    groups:[
+      {label:'New Customers', metrics:['New Customer Net Revenue','New Customer Orders','New Customer AOV']},
+      {label:'Repeat Customers', metrics:['Repeat Customer Net Revenue','Repeat Customer Orders','Repeat Customer AOV']},
+    ],
+    subtotals:[],
+    charts:['New Customer Net Revenue','Repeat Customer Net Revenue','AOV (Net Revenue / Orders)'],
+  },
+  full: {
+    title:'All Metrics', sub:'Complete Dashboard',
+    groups:[
+      {label:'Revenue', metrics:['Gross Revenue','Shipping Revenue','Discounts','Refunds','Net Revenue ']},
+      {label:'COGS', metrics:['COGS - Product','COGS - Shipping','Gross Profit','Gross Profit % Margin']},
+      {label:'Operating', metrics:['Ad Spend','Selling Fees (Merchant Fees & Commissions)','Contribution Profit (EST)','Contribution Margin % (EST)','OPEX (EST)','EBITDA (EST)','EBITDA % (EST)']},
+      {label:'Marketing', metrics:['ROAS (Net Revenue / Ad Spend)','Total Ad Spend','Ad Spend % of Net Revenue','AOV (Net Revenue / Orders)','Total Orders','NCAC (Ad Spend / New Customer Orders)','CAC (Ad Spend / Total Orders)']},
+      {label:'Ad Channels', metrics:['Facebook Ad Spend','Google Ad Spend','TikTok Ad Spend','Amazon Ad Spend','Other Ad Spend']},
+      {label:'Customers', metrics:['New Customer Net Revenue','New Customer Orders','New Customer AOV','Repeat Customer Net Revenue','Repeat Customer Orders','Repeat Customer AOV']},
+    ],
+    subtotals:['Net Revenue ','Gross Profit','Contribution Profit (EST)','EBITDA (EST)','Total Ad Spend'],
+    charts:['Gross Revenue','EBITDA (EST)','ROAS (Net Revenue / Ad Spend)'],
+  },
+};
+
+// ══════════════════════════════════════════════════
+// FORMAT
+// ══════════════════════════════════════════════════
+const isPct = (m) => m.includes('%') || m.includes('Margin') || m.includes('Rate') || m.includes('MER');
+const isX   = (m) => m.includes('ROAS') || m.includes('dMER');
+const isDollar = (m) => !isPct(m) && !isX(m);
+
+function fmt(v, metric) {
+  if(v===null||v===undefined||isNaN(v)) return '—';
+  const n = Number(v);
+  if(isPct(metric)) return (n*100).toFixed(1)+'%';
+  if(isX(metric)) return n.toFixed(2)+'×';
+  // dollar
+  const neg = n < 0;
+  const abs = Math.abs(n);
+  let s;
+  if(abs>=1e6) s = '$'+(abs/1e6).toFixed(2)+'M';
+  else if(abs>=1e3) s = '$'+(abs/1e3).toFixed(0)+'K';
+  else s = '$'+abs.toFixed(0);
+  return neg ? '('+s+')' : s;
+}
+
+function fmtShort(v,metric){
+  if(v===null||v===undefined||isNaN(v)) return '—';
+  const n=Number(v);
+  if(isPct(metric)) return (n*100).toFixed(1)+'%';
+  if(isX(metric)) return n.toFixed(2)+'×';
+  const neg=n<0; const abs=Math.abs(n);
+  let s = abs>=1e6?'$'+(abs/1e6).toFixed(1)+'M':abs>=1e3?'$'+(abs/1e3).toFixed(0)+'K':'$'+abs.toFixed(0);
+  return neg?'('+s+')':s;
+}
+
+function vsGoal(actual, goal, metric) {
+  if(!actual||!goal||goal===0) return '';
+  const ratio = actual/goal;
+  const pct = ((ratio-1)*100).toFixed(0);
+  const isNegMetric = metric.includes('Discount')||metric.includes('Refund')||metric.includes('COGS')||metric.includes('Cost')||metric.includes('OPEX')||metric.includes('CAC')||metric.includes('NCAC')||metric.includes('Ad Spend')||metric.includes('Fee');
+  // for negative metrics, lower than goal = good
+  const isGood = isNegMetric ? (actual <= goal) : (actual >= goal);
+  const sign = pct > 0 ? '+' : '';
+  return `<span class="vs-goal ${isGood?'above':'below'}">${sign}${pct}%</span>`;
+}
+
+function chgPct(a, b) {
+  if(!a||!b) return null;
+  return ((b-a)/Math.abs(a)*100).toFixed(1);
+}
+
+// ══════════════════════════════════════════════════
+// COLUMNS: determine which columns to show
+// ══════════════════════════════════════════════════
+function getColumns() {
+  const {month, selectedWeeks, compare} = state;
+  const cols = [];
+  const months = month === 'all' ? MONTHS : [month];
+
+  months.forEach(mo => {
+    cols.push({type:'goal', month:mo, key:'goal', label:'Goal', monthLabel:MONTH_SHORT[mo]});
+    WEEKS.forEach(wk => {
+      const show = selectedWeeks.length === 0 || selectedWeeks.includes(wk);
+      if(show) cols.push({type:'week', month:mo, key:wk, label:WEEK_LABELS[wk], monthLabel:MONTH_SHORT[mo], selected: selectedWeeks.includes(wk)});
+    });
+    cols.push({type:'actual', month:mo, key:'actual', label:month==='all'?'Monthly Actual':'Total Actual', monthLabel:MONTH_SHORT[mo]});
+  });
+  return cols;
+}
+
+// ══════════════════════════════════════════════════
+// BUILD TABLE
+// ══════════════════════════════════════════════════
+function buildTable() {
+  const sec = SECTIONS[state.section];
+  const cols = getColumns();
+
+  // Group columns by month for header spanning
+  const monthGroups = {};
+  cols.forEach(c => {
+    if(!monthGroups[c.month]) monthGroups[c.month] = [];
+    monthGroups[c.month].push(c);
+  });
+
+  // Build thead
+  let thead = `<thead>`;
+
+  // Row 1: Month headers
+  thead += `<tr class="h-month">`;
+  thead += `<th class="th-metric" rowspan="2">Metric</th>`;
+  thead += `<th class="th-metric" rowspan="2">Source</th>`;
+  Object.entries(monthGroups).forEach(([mo, moCols]) => {
+    thead += `<th colspan="${moCols.length}" style="background:#1C1C1C;border-bottom:1px solid #333">${MONTH_LABELS[mo]}</th>`;
+  });
+  thead += `</tr>`;
+
+  // Row 2: Column sub-headers
+  thead += `<tr class="h-cols">`;
+  cols.forEach(c => {
+    let cls = c.type === 'goal' ? 'th-goal' : c.type === 'actual' ? 'th-actual' : (c.selected ? 'th-week th-week-sel' : 'th-week');
+    thead += `<th class="${cls}">${c.label}</th>`;
+  });
+  thead += `</tr></thead>`;
+
+  // Build tbody
+  let tbody = `<tbody>`;
+
+  sec.groups.forEach(group => {
+    // Group section row
+    tbody += `<tr class="tr-section"><td class="td-metric" colspan="${cols.length+2}">${group.label}</td></tr>`;
+
+    group.metrics.forEach(metricName => {
+      const mData = byMetric[metricName] || byMetric[metricName.trim()];
+      if(!mData) return;
+
+      const isSubtotal = sec.subtotals.includes(metricName);
+      const isTotal = metricName.includes('EBITDA (EST)') || metricName === 'Net Revenue ';
+      const isPctRow = isPct(metricName) || isX(metricName);
+
+      let rowCls = isTotal ? 'tr-total' : isSubtotal ? 'tr-subtotal' : isPctRow ? 'tr-pct' : '';
+
+      tbody += `<tr class="${rowCls}">`;
+      // Metric name & source
+      const displayName = metricName.trim();
+      tbody += `<td class="td-metric">${displayName}</td>`;
+      tbody += `<td class="td-source">${mData.source||''}</td>`;
+
+      cols.forEach(c => {
+        const moData = mData[c.month];
+        let val = moData ? moData[c.key] : null;
+
+        let cellCls = c.type === 'goal' ? 'td-goal' : c.type === 'actual' ? 'td-actual' : (c.selected ? 'td-week week-sel' : 'td-week');
+
+        let content = fmt(val, metricName);
+
+        // Add vs-goal badge on actual column
+        if(c.type === 'actual' && moData) {
+          const badge = vsGoal(val, moData.goal, metricName);
+          if(badge) content += ' ' + badge;
+        }
+
+        tbody += `<td class="${cellCls}">${content}</td>`;
+      });
+
+      tbody += `</tr>`;
+    });
+  });
+
+  tbody += `</tbody>`;
+
+  document.getElementById('tableContainer').innerHTML =
+    `<table class="ex-table">${thead}${tbody}</table>`;
+}
+
+// ══════════════════════════════════════════════════
+// SUMMARY STRIP
+// ══════════════════════════════════════════════════
+function buildSummary() {
+  const {month} = state;
+  const months = month === 'all' ? MONTHS : [month];
+
+  const getSum = (metricName, field) => {
+    const mData = byMetric[metricName] || byMetric[metricName.trim()];
+    if(!mData) return 0;
+    return months.reduce((acc, mo) => {
+      const v = mData[mo]?.[field];
+      return acc + (Number(v)||0);
+    }, 0);
+  };
+  const getLast = (metricName, field) => {
+    const mData = byMetric[metricName] || byMetric[metricName.trim()];
+    if(!mData) return null;
+    const lastMo = months[months.length-1];
+    return mData[lastMo]?.[field];
+  };
+  const avgLast = (metricName, field) => {
+    const mData = byMetric[metricName];
+    if(!mData) return null;
+    return mData[months[months.length-1]]?.[field];
+  };
+
+  const grossRevActual = getSum('Gross Revenue', 'actual');
+  const grossRevGoal = getSum('Gross Revenue', 'goal');
+  const netRevActual = getSum('Net Revenue ', 'actual');
+  const ebitdaActual = getSum('EBITDA (EST)', 'actual');
+  const ordersActual = getSum('Total Orders', 'actual');
+  const roasLast = avgLast('ROAS (Net Revenue / Ad Spend)', 'actual');
+  const gm = avgLast('Gross Profit % Margin', 'actual');
+  const contribM = avgLast('Contribution Margin % (EST)', 'actual');
+
+  const revPct = grossRevGoal ? ((grossRevActual/grossRevGoal-1)*100).toFixed(1) : null;
+
+  const kpis = [
+    {label:'Gross Revenue', val:fmtShort(grossRevActual,'Gross Revenue'), delta: revPct!==null ? `${revPct>0?'+':''}${revPct}% vs goal` : null, up: revPct>0},
+    {label:'Net Revenue', val:fmtShort(netRevActual,'Net Revenue'), delta:null},
+    {label:'Gross Margin', val:fmt(gm,'Gross Margin %'), delta:null},
+    {label:'EBITDA', val:fmtShort(ebitdaActual,'EBITDA (EST)'), delta:null, up: ebitdaActual>0},
+    {label:'Contrib. Margin', val:fmt(contribM,'Contribution Margin % (EST)'), delta:null},
+    {label:'Total Orders', val:Number(ordersActual).toLocaleString(), delta:null},
+    {label:'ROAS', val:fmt(roasLast,'ROAS (Net Revenue / Ad Spend)'), delta:null},
+  ];
+
+  document.getElementById('summaryStrip').innerHTML = kpis.map(k => `
+    <div class="summary-kpi">
+      <div class="sk-label">${k.label}</div>
+      <div class="sk-val">${k.val}</div>
+      ${k.delta ? `<div class="sk-delta ${k.up?'up':'dn'}">${k.up?'↑':'↓'} ${k.delta}</div>` : '<div class="sk-delta nt">YTD</div>'}
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════
+// CHARTS
+// ══════════════════════════════════════════════════
+const GOLD='#B8892A',GOLD_L='#D4AA50',ROSE='#C9A99A',MID='#6B6B6B';
+const BORDER='#E2DDD6',GREEN='#2E7D52',RED='#B03030',BLUE='#2B5BA8';
+Chart.defaults.font.family="'Jost',sans-serif";
+Chart.defaults.color=MID;
+Chart.defaults.plugins.legend.display=false;
+const TP={backgroundColor:'#1C1C1C',titleColor:'#fff',bodyColor:'#ccc',padding:10,cornerRadius:6};
+
+let charts = [];
+function killCharts(){ charts.forEach(c=>{try{c.destroy();}catch(e){}});charts=[];}
+
+function getChartLabels() {
+  const {month, selectedWeeks} = state;
+  const months = month === 'all' ? MONTHS : [month];
+  const labels = [];
+  months.forEach(mo => {
+    if(selectedWeeks.length > 0) {
+      selectedWeeks.forEach(wk => labels.push(`${MONTH_SHORT[mo]} ${WEEK_LABELS[wk]}`));
+    } else {
+      labels.push(MONTH_SHORT[mo]);
+    }
+  });
+  return labels;
+}
+
+function getChartData(metricName) {
+  const mData = byMetric[metricName] || byMetric[metricName.trim()];
+  if(!mData) return {actual:[], goal:[]};
+  const {month, selectedWeeks} = state;
+  const months = month === 'all' ? MONTHS : [month];
+  const actual=[], goal=[];
+  months.forEach(mo => {
+    if(selectedWeeks.length > 0) {
+      selectedWeeks.forEach(wk => {
+        actual.push(mData[mo]?.[wk]||null);
+        goal.push(null); // no weekly goal
+      });
+    } else {
+      actual.push(mData[mo]?.actual||null);
+      goal.push(mData[mo]?.goal||null);
+    }
+  });
+  return {actual, goal};
+}
+
+function buildCharts() {
+  killCharts();
+  const sec = SECTIONS[state.section];
+  const labels = getChartLabels();
+
+  const chartMetas = [
+    {id:'c1', metric:sec.charts[0]},
+    {id:'c2', metric:sec.charts[1]},
+    {id:'c3', metric:sec.charts[2]},
+  ];
+
+  chartMetas.forEach(({id, metric}) => {
+    document.getElementById(id+'title') && (document.getElementById(id+'title').textContent = metric.replace(' (EST)','').replace('(Net Revenue / Ad Spend)','').replace('(Ad Spend / Total Orders)','').trim());
+    const el = document.getElementById(id);
+    if(!el) return;
+    const {actual, goal} = getChartData(metric);
+
+    const isNeg = actual.some(v=>v<0);
+    const vals = actual.map(v=>isPct(metric)?(v*100):isX(metric)?v:(v/1e6));
+    const goalVals = goal.map(v=>v===null?null:isPct(metric)?(v*100):isX(metric)?v:(v/1e6));
+
+    const datasets = [
+      {
+        label:'Actual',
+        data:vals,
+        backgroundColor:actual.map(v=>v>=0?GOLD+'88':RED+'88'),
+        borderColor:actual.map(v=>v>=0?GOLD:RED),
+        borderWidth:2, borderRadius:4, type:'bar'
+      },
+      {
+        label:'Goal',
+        data:goalVals,
+        type:'line',
+        borderColor:ROSE,
+        borderDash:[4,3],
+        pointBackgroundColor:ROSE,
+        pointRadius:4, borderWidth:1.5,
+        backgroundColor:'transparent'
+      }
+    ];
+
+    const c = new Chart(el.getContext('2d'),{
+      type:'bar',
+      data:{labels, datasets},
+      options:{
+        responsive:true, maintainAspectRatio:true,
+        plugins:{
+          legend:{display:true, labels:{font:{size:9},color:MID,boxWidth:8,padding:10}},
+          tooltip:{...TP}
+        },
+        scales:{
+          x:{grid:{display:false},ticks:{font:{size:9},color:MID}},
+          y:{grid:{color:BORDER,lineWidth:1},ticks:{font:{size:9},color:MID,
+            callback:v=>isPct(metric)?v.toFixed(0)+'%':isX(metric)?v.toFixed(1)+'×':'$'+Math.abs(v).toFixed(1)+'M'
+          }}
+        }
+      }
+    });
+    charts.push(c);
+  });
+}
+
+// ══════════════════════════════════════════════════
+// STATE HANDLERS
+// ══════════════════════════════════════════════════
+function setMonth(mo, btn) {
+  state.month = mo;
+  document.querySelectorAll('.filterbar .chip:not(.week-chip)').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function toggleWeek(wk, btn) {
+  const idx = state.selectedWeeks.indexOf(wk);
+  if(idx>=0) state.selectedWeeks.splice(idx,1);
+  else state.selectedWeeks.push(wk);
+  btn.classList.toggle('selected', state.selectedWeeks.includes(wk));
+  render();
+}
+
+function toggleCompare() {
+  state.compare = !state.compare;
+  const sw = document.getElementById('compareSwitch');
+  sw.classList.toggle('on', state.compare);
+  document.getElementById('compareLabel').style.color = state.compare ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.25)';
+  render();
+}
+
+function showSection(sec, el) {
+  state.section = sec;
+  document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+  const s = SECTIONS[sec];
+  document.getElementById('sectionTitle').textContent = s.title;
+  document.getElementById('sectionSub').textContent = s.sub;
+  render();
+}
+
+function render() {
+  buildSummary();
+  buildCharts();
+  buildTable();
+}
+
+// Init
+render();
+</script>
+
+</body></html>
